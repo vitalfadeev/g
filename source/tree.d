@@ -126,6 +126,35 @@ class TreeObject : Object
     {
         return ( l_child !is null );
     }
+
+
+    //
+    ChildsForwardIterator childs()
+    {
+        return ChildsForwardIterator( this );
+    }
+
+    struct ChildsForwardIterator
+    {
+        TreeObject parent;
+        TreeObject front;
+
+        this( TreeObject parent )
+        {
+            this.parent = parent;
+            this.front  = parent.l_child;
+        }
+
+        bool empty()
+        {
+            return ( front is null );
+        }
+
+        void popFront()
+        {
+            front = front.r;
+        }
+    }
 }
 
 
@@ -135,6 +164,8 @@ class GObject : TreeObject
     ubyte     flags;
     SDL_Color fg;
     SDL_Color bg;
+
+    SizeMode  size_mode;
 
 
     override
@@ -207,6 +238,14 @@ class GObject : TreeObject
 }
 
 
+enum SizeMode
+{
+    FIXED,
+    BY_CHILD,
+}
+ 
+
+
 class Tree
 {
     GObject root;
@@ -249,19 +288,25 @@ void walk_in_width( FUNC )( GObject root, FUNC callback )
 //
 void each_child( FUNC )( GObject root, FUNC callback )
 {
-    GObject cur;
+    //GObject cur;
     
-    for ( cur = cast( GObject )root.l_child; cur !is null; cur = cast( GObject )cur.r )
-        callback( cur );
+    //for ( cur = cast( GObject )root.l_child; cur !is null; cur = cast( GObject )cur.r )
+    //    callback( cur );
+
+    foreach ( c; root.childs )
+        callback( c );
 }
 
 
 //
 void each_child_main( TreeObject root, SDL_Event* e )
 {
-    TreeObject c;
+    //TreeObject c;
     
-    for ( c = root.l_child; c !is null; c = c.r )
+    //for ( c = root.l_child; c !is null; c = c.r )
+    //    c.main( e );
+
+    foreach ( c; root.childs )
         c.main( e );
 }
 
@@ -269,9 +314,12 @@ void each_child_main( TreeObject root, SDL_Event* e )
 //
 void each_child_render( GObject root, SDL_Renderer* renderer )
 {
-    TreeObject c;
+    //TreeObject c;
     
-    for ( c = root.l_child; c !is null; c = c.r )
+    //for ( c = root.l_child; c !is null; c = c.r )
+    //    (cast( GObject )c).render( renderer );
+
+    foreach ( c; root.childs )
         (cast( GObject )c).render( renderer );
 }
 
@@ -279,11 +327,14 @@ void each_child_render( GObject root, SDL_Renderer* renderer )
 //
 void dump_tree( Tree tree )
 {
-    void callback( GObject cur )
-    {
-        writeln( "  ", cur );
-    }
+    //void callback( GObject cur )
+    //{
+    //    writeln( "  ", cur );
+    //}
 
     // scan tree
-    each_child( tree.root, &callback );
+    //each_child( tree.root, &callback );
+
+    foreach ( c; tree.root.childs )
+        writeln( "  ", c );
 }

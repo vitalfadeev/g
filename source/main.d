@@ -7,7 +7,7 @@ import op;
 import defs;
 import panel;
 import bindbc.sdl;
-
+import sdlexception;
 
 int main()
 {
@@ -21,9 +21,12 @@ int main()
     Tree tree;
     create_tree( tree );
 
-    // Window, Surface
-    SDL_Window*  window;
+    // Window
+    SDL_Window* window;
     create_window( window );
+
+    // Window size
+    window_size_fromn_gobject( window, tree.root );
 
     // Renderer
     SDL_Renderer* renderer;
@@ -81,16 +84,16 @@ void create_tree( ref Tree tree )
     lmb.rect.w = 256;
     lmb.rect.h = 64;
     lmb.text = "LMenu";
-    lmb.bg = SDL_Color( 0,  48,  48, SDL_ALPHA_OPAQUE );
-    lmb.fg = SDL_Color( 0, 255, 255, SDL_ALPHA_OPAQUE );
+    //lmb.bg = SDL_Color( 0,  48,  48, SDL_ALPHA_OPAQUE );
+    //lmb.fg = SDL_Color( 0, 255, 255, SDL_ALPHA_OPAQUE );
 
     rmb.rect.x = 1366 - 256;
     rmb.rect.y = 0;
     rmb.rect.w = 256;
     rmb.rect.h = 64;
     rmb.text = "RMenu";
-    rmb.bg = SDL_Color(  48, 0,  48, SDL_ALPHA_OPAQUE );
-    rmb.fg = SDL_Color( 255, 0, 255, SDL_ALPHA_OPAQUE );
+    //rmb.bg = SDL_Color(  48, 0,  48, SDL_ALPHA_OPAQUE );
+    //rmb.fg = SDL_Color( 255, 0, 255, SDL_ALPHA_OPAQUE );
 
     clck.rect.x = ( 1366 - 256 ) / 2;
     clck.rect.y = 0;
@@ -98,6 +101,16 @@ void create_tree( ref Tree tree )
     clck.rect.h = 64;
     clck.bg = SDL_Color(  48,  48, 0, SDL_ALPHA_OPAQUE );
     clck.fg = SDL_Color( 255, 255, 0, SDL_ALPHA_OPAQUE );
+
+    // CSS
+    import button : styles, Style1, Style2, Style3, apply_styles;
+    styles ~= new Style1();
+    styles ~= new Style2();
+    styles ~= new Style3();
+
+    apply_styles( lmb );
+    //apply_styles( clck );
+    apply_styles( rmb );
 }
 
 
@@ -140,7 +153,7 @@ void create_window( ref SDL_Window* window )
     window = 
         SDL_CreateWindow(
             "SDL2 Window",
-            SDL_WINDOWPOS_CENTERED,
+            0,
             64,
             1366, 96,
             0
@@ -151,6 +164,13 @@ void create_window( ref SDL_Window* window )
 
     // Update
     SDL_UpdateWindowSurface( window );    
+}
+
+
+//
+void window_size_fromn_gobject( SDL_Window* window, GObject o )
+{
+    SDL_SetWindowSize( window, o.rect.w, o.rect.h );
 }
 
 
@@ -200,17 +220,7 @@ void event_loop( Tree tree, ref SDL_Window* window, SDL_Renderer* renderer )
         }
 
         // Delay
-        SDL_Delay( 100 );
-    }
-}
-
-
-//
-class SDLException : Exception
-{
-    this( string msg )
-    {
-        super( format!"%s: %s"( SDL_GetError().to!string, msg ) );
+        //SDL_Delay( 100 );
     }
 }
 
