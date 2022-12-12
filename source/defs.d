@@ -1,0 +1,2 @@
+enum OP_STORE_SIZE = 4096;
+
