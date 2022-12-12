@@ -5,9 +5,13 @@ import std.typecons;
 import tree;
 import op;
 import defs;
+import gobject;
+import window;
+import windows;
 import panel;
 import bindbc.sdl;
 import sdlexception;
+
 
 int main()
 {
@@ -32,11 +36,14 @@ int main()
     SDL_Renderer* renderer;
     create_renderer( window, renderer );
 
+    // Save window for manage
+    manage_window( new Window( window, tree, renderer ) );
+
     // Render
     tree.push_render();
 
     // Event Loop
-    event_loop( tree, window, renderer );
+    event_loop();
 
     return 0;
 }
@@ -103,7 +110,7 @@ void create_tree( ref Tree tree )
     clck.fg = SDL_Color( 255, 255, 0, SDL_ALPHA_OPAQUE );
 
     // CSS
-    import button : styles, Style1, Style2, Style3, apply_styles;
+    import style : styles, Style1, Style2, Style3, apply_styles;
     styles ~= new Style1();
     styles ~= new Style2();
     styles ~= new Style3();
@@ -112,7 +119,6 @@ void create_tree( ref Tree tree )
     //apply_styles( clck );
     apply_styles( rmb );
 }
-
 
 
 //
@@ -163,7 +169,7 @@ void create_window( ref SDL_Window* window )
         throw new SDLException( "Failed to create window" );
 
     // Update
-    SDL_UpdateWindowSurface( window );    
+    SDL_UpdateWindowSurface( window );
 }
 
 
@@ -181,7 +187,7 @@ void create_renderer( SDL_Window* window, ref SDL_Renderer* renderer )
 }
 
 //
-void event_loop( Tree tree, ref SDL_Window* window, SDL_Renderer* renderer )
+void event_loop()
 {
     //
     bool game_is_still_running = true;
@@ -191,9 +197,9 @@ void event_loop( Tree tree, ref SDL_Window* window, SDL_Renderer* renderer )
     {
         SDL_Event e;
 
+        // Process Event
         while ( SDL_PollEvent( &e ) > 0 ) 
         {
-            // Process Event
             // SDL_QUIT
             if ( e.type == SDL_QUIT ) 
             {
@@ -206,16 +212,29 @@ void event_loop( Tree tree, ref SDL_Window* window, SDL_Renderer* renderer )
             if ( e.type == OP.RENDER )
             {
                 auto obj = cast( GObject )e.user.data1;
-                tree.render( renderer, &obj.rect );
 
-                // Raxterize
-                SDL_RenderPresent( renderer );
+                // Find
+                Window[] obj_windows;
+                find_windows_with_object( obj_windows, obj );
+
+                // Render
+                foreach ( window; obj_windows )
+                {
+                    // Layout
+                    window.tree.layout();
+
+                    // Render
+                    obj.render( window.renderer );
+
+                    // Raxterize
+                    SDL_RenderPresent( window.renderer );
+                }
             }
             else
 
             // ANY
             {
-                tree.main( &e );
+                all_windows_main( &e );
             }
         }
 
@@ -223,16 +242,6 @@ void event_loop( Tree tree, ref SDL_Window* window, SDL_Renderer* renderer )
         //SDL_Delay( 100 );
     }
 }
-
-
-//
-void show_sdl_error( string file=__FILE__, int lineno=__LINE__ )
-{
-    const char* msg = SDL_GetError();
-    writeln( "ERR: SDL:", msg, ": ", file, ": ", lineno );
-}
-
-
 
 
 //
