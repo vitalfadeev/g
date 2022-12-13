@@ -1,13 +1,17 @@
 module panel;
 
 import std.conv;
+import std.format;
 import std.stdio;
 import bindbc.sdl;
 import tree;
+import treeobject;
 import gobject;
 import op;
 import defs;
 import button;
+import text;
+import style;
 
 
 class Panel : GObject
@@ -22,15 +26,39 @@ class Panel : GObject
 }
 
 
-class Clock : GObject
+class Clock : Text
 {
     override
     size_t mouse_button( SDL_Event* e )
     {
-        // next childs
-        super.mouse_button( e );
+        if ( e.type == SDL_MOUSEBUTTONDOWN )
+        {
+            // Update
+            update_clock();
+
+            // Render
+            push_render();
+
+            // Childs
+            this.each_child_main( e );
+        }
 
         return 0;
+    }
+
+
+    void update_clock()
+    {
+        import std.datetime.systime : Clock, SysTime;
+        import std.datetime.timezone : LocalTime;
+
+        SysTime today = Clock.currTime();
+        assert( today.timezone is LocalTime() );
+
+        text = 
+            format!
+                " %0.2d:%0.2d:%0.2d"
+                ( today.hour, today.minute, today.second );
     }
 }
 
@@ -46,8 +74,14 @@ class RMenuButton : Button
     override
     size_t mouse_button( SDL_Event* e )
     {
-        // State, Childs
-        super.mouse_button( e );
+        // State
+        change_state( e );
+
+        // Styles
+        apply_styles( this );
+
+        // Remder
+        push_render();
 
         // Popup
         if ( e.button.type == SDL_MOUSEBUTTONDOWN )
@@ -68,6 +102,9 @@ class RMenuButton : Button
 
             create_popup_menu( &at_point );
         }
+
+        // Childs
+        this.each_child_main( e );
 
         return 0;
     }

@@ -21,6 +21,9 @@ void create_popup_menu( SDL_Point* at_point )
     Menu menu;
     create_menu( menu );
 
+    // fix position for desktop
+    fix_popup_position( at_point, menu.rect.w, menu.rect.h );
+
     // create window
     SDL_Window* window;
     create_window( window, at_point );
@@ -30,6 +33,25 @@ void create_popup_menu( SDL_Point* at_point )
 
     //
     window_size_fromn_gobject( window, menu );
+}
+
+
+//
+void fix_popup_position( SDL_Point* at_point, int w, int h )
+{
+    int display_index;
+    SDL_DisplayMode mode;
+
+    if ( SDL_GetDesktopDisplayMode( display_index, &mode ) )
+        throw new SDLException( "ERR: Getting display mode" );
+
+    // right 
+    if ( at_point.x + w > mode.w )
+        at_point.x = mode.w - w;
+
+    // bottom
+    if ( at_point.y + h > mode.h )
+        at_point.y = mode.h - h;
 }
 
 
@@ -52,6 +74,8 @@ void create_menu( ref Menu menu )
 {
     menu = new Menu();
     menu.size_mode = SizeMode.BY_CHILD;
+    menu.rect.w = 200;
+    menu.rect.h = 400;
 
     auto vbox = new VBoxLayout();
     menu.add( vbox );
@@ -62,6 +86,8 @@ void create_menu( ref Menu menu )
     vbox.add( b1 );
     vbox.add( b2 );
     vbox.add( b3 );
+
+    menu.layout();
 }
 
 

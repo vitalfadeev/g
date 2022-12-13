@@ -51,11 +51,7 @@ class GObject : TreeObject
     size_t mouse_button( SDL_Event* e )
     {
         // State
-        if ( e.type == SDL_MOUSEBUTTONDOWN )
-            state |= STATE_PRESSED;
-        else
-        if ( e.type == SDL_MOUSEBUTTONUP )
-            state &= ~STATE_PRESSED;
+        change_state( e );
 
         // Styles
         apply_styles( this );
@@ -67,6 +63,16 @@ class GObject : TreeObject
         this.each_child_main( e );
 
         return 0;
+    }
+
+
+    void change_state( SDL_Event* e )
+    {
+        if ( e.type == SDL_MOUSEBUTTONDOWN )
+            state |= STATE_PRESSED;
+        else
+        if ( e.type == SDL_MOUSEBUTTONUP )
+            state &= ~STATE_PRESSED;        
     }
 
 
@@ -116,7 +122,8 @@ class GObject : TreeObject
 
     void render_childs( SDL_Renderer* renderer )
     {
-        this.each_child_render( renderer );        
+        foreach ( c; childs )
+            (cast( GObject )c).render( renderer );
     }
 
 
@@ -139,12 +146,4 @@ enum SizeMode
 {
     FIXED,
     BY_CHILD,
-}
-
-
-//
-void each_child_render( GObject root, SDL_Renderer* renderer )
-{
-    foreach ( c; root.childs )
-        (cast( GObject )c).render( renderer );
 }

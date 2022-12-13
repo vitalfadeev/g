@@ -10,6 +10,7 @@ import window;
 import windows;
 import panel;
 import bindbc.sdl;
+import bindbc.sdl.ttf;
 import sdlexception;
 
 
@@ -52,6 +53,7 @@ int main()
 //
 void init_sdl()
 {
+    // SDL
     SDLSupport ret = loadSDL();
 
     if ( ret != sdlSupport )
@@ -62,7 +64,22 @@ void init_sdl()
             throw new Exception( "One or more symbols failed to load. The likely cause is that the shared library is for a lower version than bindbc-sdl was configured to load (via SDL_204, GLFW_2010 etc.)" );
     }
 
-    loadSDL( "sdl2.dll" );
+    if ( SDL_Init( SDL_INIT_EVERYTHING ) )
+        throw new Exception( "ERR: SDL_Init()" );
+
+    // TTF
+    SDLTTFSupport ret_ttf = loadSDLTTF();
+
+    if ( ret_ttf != sdlTTFSupport )
+    {
+        if ( ret_ttf == SDLTTFSupport.noLibrary ) 
+            throw new Exception( "The SDL_TTF shared library failed to load" );
+        else if ( SDLTTFSupport.badLibrary ) 
+            throw new Exception( "One or more symbols failed to load. The likely cause is that the shared library is for a lower version than bindbc-sdl was configured to load (via SDL_TTF_2018, etc.)" );
+    }
+
+    if ( TTF_Init() )
+        throw new Exception( "ERR: TTF_Init()" );
 }
 
 
