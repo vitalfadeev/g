@@ -71,8 +71,8 @@ class Tree
                 parents ~= front;
                 front = front.l_child;
             }
-            else
 
+            else
             if ( front.r !is null )
                 front = front.r;
 

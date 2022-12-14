@@ -7,6 +7,7 @@ import op;
 import style;
 import states;
 import treeobject;
+import sdlexception;
 
 
 class GObject : TreeObject
@@ -16,7 +17,13 @@ class GObject : TreeObject
     SDL_Color fg;
     SDL_Color bg;
 
-    SizeMode  size_mode;
+    WMODE w_mode;
+    HMODE h_mode;
+
+    int padding_l; // left
+    int padding_t; // top
+    int padding_r; // right
+    int padding_b; // bottom
 
     BitFlags!States state;
 
@@ -136,13 +143,71 @@ class GObject : TreeObject
         e.user.code     = OP.RENDER;
         e.user.data1    = cast( void* )this; // FIXME
         e.user.data2    = null;
-        SDL_PushEvent( &e );
+        auto res = SDL_PushEvent( &e );
+        //  1 - success
+        //  0 - filtered
+        // <0 - error
+        if ( res == 0 )
+            throw new SDLException( "SDL_PushEvent(): filtered" );
+        else if ( res < 0 )
+            throw new SDLException( "SDL_PushEvent(): error" );
+    }
+
+
+    //
+    void content_rect( SDL_Rect* crect )
+    {
+        crect.x = rect.x + padding_l;
+        crect.y = rect.y + padding_t;
+        crect.w = rect.w - padding_l - padding_r;
+        crect.h = rect.h - padding_t - padding_b;
+    }
+
+
+    //
+    void center_content_rect( SDL_Rect* crect )
+    {
+        // center_rect_in_rect()
+    }
+
+
+    //
+    void center_rect_in_rect( SDL_Rect* small_rect, SDL_Rect* big_rect )
+    {
+        // center_x()
+        // center_y()
+
+            //// Center: Lon[g t]ext
+            //if ( w > crect.w )
+            //{
+            //    SDL_RenderSetClipRect( renderer, &crect );
+            //    text_location.x = crect.x;
+            //    text_location.y = crect.y;
+            //    text_location.w = w;
+            //    text_location.h = h;
+            //}
+
+            //// Center: [ Short text ]
+            //else
+            //{
+            //    SDL_RenderSetClipRect( renderer, &crect );
+            //    text_location.x = crect.x + ( crect.w - w ) / 2;
+            //    text_location.y = crect.y + ( crect.h - h ) / 2;
+            //    text_location.w = w;
+            //    text_location.h = h;
+            //}
     }
 }
 
 
 //
-enum SizeMode
+enum HMODE
+{
+    FIXED,
+    BY_CHILD,
+}
+
+enum WMODE
 {
     FIXED,
     BY_CHILD,

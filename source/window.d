@@ -49,18 +49,18 @@ class Window
                     // Close
                     SDL_DestroyWindow( window );
                 }
-                else
 
                 // ANY WINDOW EVENT
+                else
                 {
                     //
                 }
             }
         }
-        else
 
         // SDL_MOUSEBUTTONDOWN
         // SDL_MOUSEBUTTONUP
+        else
         if (( e.type == SDL_MOUSEBUTTONDOWN ) ||
             ( e.type == SDL_MOUSEBUTTONUP ))
         {
@@ -70,9 +70,9 @@ class Window
                     return tree.main( e );
             }
         }
-        else
 
         // ANY
+        else
         {
             //
         }

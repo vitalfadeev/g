@@ -14,8 +14,9 @@ struct _OP
     Uint32 KEYUP;
     Uint32 CLICK;
     Uint32 CLICKED;
+    Uint32 TIMER;
 }
-static
+shared
 _OP OP;
 
 // SDL_UserEvent()
@@ -30,4 +31,5 @@ void register_custom_events()
     OP.KEYUP    = SDL_RegisterEvents( 1 );
     OP.CLICK    = SDL_RegisterEvents( 1 );
     OP.CLICKED  = SDL_RegisterEvents( 1 );
+    OP.TIMER    = SDL_RegisterEvents( 1 );
 }

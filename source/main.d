@@ -9,6 +9,7 @@ import gobject;
 import window;
 import windows;
 import panel;
+import hboxlayout;
 import bindbc.sdl;
 import bindbc.sdl.ttf;
 import sdlexception;
@@ -91,17 +92,25 @@ void create_tree( ref Tree tree )
     // Panel
     auto panel = new Panel;
     tree.root = panel;
+    panel.h_mode = HMODE.FIXED;
     panel.rect.x = 0;
     panel.rect.y = 0;
-    panel.rect.w = 1366;
-    panel.rect.h = 64;
+    SDL_DisplayMode display_mode;
+    SDL_GetCurrentDisplayMode( 0, &display_mode );
+    panel.rect.w = display_mode.w; // 1366
+    panel.rect.h = 32;
+
+    auto hbox = new HBoxLayout;
+    hbox.rect.w = panel.rect.w;
+    hbox.rect.h = panel.rect.h;
+    panel.add_child( hbox );
     
     auto lmb  = new LMenuButton;
     auto rmb  = new RMenuButton;
     auto clck = new Clock;
-    panel.add_child( lmb );
-    panel.add_child( clck  );
-    panel.add_child( rmb  );
+    hbox.add_child( lmb );
+    hbox.add_child( clck  );
+    hbox.add_child( rmb  );
 
     lmb.rect.x = 0;
     lmb.rect.y = 0;
@@ -125,15 +134,14 @@ void create_tree( ref Tree tree )
     clck.rect.h = 64;
     clck.bg = SDL_Color(  48,  48, 0, SDL_ALPHA_OPAQUE );
     clck.fg = SDL_Color( 255, 255, 0, SDL_ALPHA_OPAQUE );
+    clck.padding_t = 5;
+    clck.padding_b = 5;
 
     // CSS
-    import style : styles, Style1, Style2, Style3, apply_styles;
-    styles ~= new Style1();
-    styles ~= new Style2();
-    styles ~= new Style3();
-
+    import style : create_style, apply_styles;
+    create_style();
     apply_styles( lmb );
-    //apply_styles( clck );
+    apply_styles( clck );
     apply_styles( rmb );
 }
 
@@ -177,9 +185,9 @@ void create_window( ref SDL_Window* window )
         SDL_CreateWindow(
             "SDL2 Window",
             0,
-            64,
+            0,
             1366, 96,
-            0
+            SDL_WINDOW_BORDERLESS
         );
 
     if ( !window )
@@ -214,51 +222,54 @@ void event_loop()
     {
         SDL_Event e;
 
-        // Process Event
         while ( SDL_PollEvent( &e ) > 0 ) 
         {
-            // SDL_QUIT
+            // QUIT
             if ( e.type == SDL_QUIT ) 
-            {
-                game_is_still_running = false;
-                break;
-            }
-            else
+                { game_is_still_running = false; break; }
 
-            // OP.RENDER
+            // TIMER
+            else
+            if ( e.type == OP.TIMER )
+                ( cast( GObject )e.user.data1 ).main( &e ); // FIXME
+
+            // RENDER
+            else
             if ( e.type == OP.RENDER )
-            {
-                auto obj = cast( GObject )e.user.data1;
-
-                // Find
-                Window[] obj_windows;
-                find_windows_with_object( obj_windows, obj );
-
-                // Render
-                foreach ( window; obj_windows )
-                {
-                    // Layout
-                    window.tree.layout();
-
-                    // Render
-                    obj.render( window.renderer );
-
-                    // Raxterize
-                    SDL_RenderPresent( window.renderer );
-                }
-            }
-            else
+                obj_windows_main( cast( GObject )e.user.data1, &e );
 
             // ANY
-            {
+            else
                 all_windows_main( &e );
-            }
         }
-
-        // Delay
-        //SDL_Delay( 100 );
     }
 }
+
+
+//
+void obj_windows_main( GObject obj, SDL_Event* e )
+{
+    // Find
+    Window[] obj_windows;
+    find_windows_with_object( obj_windows, obj );
+
+    // Render
+    foreach ( window; obj_windows )
+    {
+        // Layout
+        window.tree.layout();
+
+        // Render
+        obj.render( window.renderer );
+
+        // Raxterize
+        SDL_RenderPresent( window.renderer );
+    }
+
+    foreach ( w; managed_windows )
+        w.main( e );
+}
+
 
 
 //

@@ -73,7 +73,8 @@ class Menu : GObject
 void create_menu( ref Menu menu )
 {
     menu = new Menu();
-    menu.size_mode = SizeMode.BY_CHILD;
+    menu.w_mode = WMODE.BY_CHILD;
+    menu.h_mode = HMODE.BY_CHILD;
     menu.rect.w = 200;
     menu.rect.h = 400;
 

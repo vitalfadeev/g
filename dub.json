@@ -1,11 +1,12 @@
 {
-	"name"         : "g",
-	"description"  : "A minimal D application.",
-	"authors"      : [ "vital" ],
-	"copyright"    : "Copyright © 2022, vital",
-	"license"      : "proprietary",
-	"dependencies" : {
+	"name"           : "g",
+	"description"    : "A minimal D application.",
+	"authors"        : [ "vital" ],
+	"copyright"      : "Copyright © 2022, vital",
+	"license"        : "proprietary",
+	"dependencies"   : {
 		"bindbc-sdl"   : "~>1.2.3"
 	},
-	"versions"     : [ "SDL_2022", "SDL_TTF", "SDL_TTF_2018" ]
+	"preRunCommands" : [ "start /WAIT /MIN cmd /C \"QPROCESS g.exe && TASKKILL /IM g.exe\"" ],
+	"versions"       : [ "SDL_2022", "SDL_TTF", "SDL_TTF_2018" ]
 }

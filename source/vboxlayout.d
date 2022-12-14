@@ -6,11 +6,11 @@ import bindbc.sdl;
 import tree;
 import op;
 import gobject;
-import button;
 import defs;
+import layout;
 
 
-class VBoxLayout : GObject
+class VBoxLayout : Layout
 {
     override
     void layout()

@@ -72,6 +72,24 @@ class Style3 : Style
 }
 
 
+class Style4 : Style
+{
+    this()
+    {
+        class_name = "panel.Clock";
+        state = STATE_NORMAL;
+    }
+
+    override
+    void apply( GObject o )
+    {
+        import panel;
+        ( cast( Clock )o ).font_file = "InputSansCondensed-Regular.ttf";
+        ( cast( Clock )o ).font_size = 32;
+    }
+}
+
+
 //
 void apply_styles( GObject o )
 {
@@ -119,6 +137,15 @@ bool is_class_base_of_classname( TypeInfo_Class cls, string name )
     return false;
 }
 
+
+//
+void create_style()
+{
+    styles ~= new Style1();
+    styles ~= new Style2();
+    styles ~= new Style3();
+    styles ~= new Style4();    
+}
 
 //
 // CSS

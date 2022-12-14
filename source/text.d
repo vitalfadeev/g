@@ -14,7 +14,7 @@ class Text : GObject
 {
     string text;
     string font_file = "InputSansCondensed-Regular.ttf";
-    int    font_size = 96;
+    int    font_size = 32;
 
     override
     void render( SDL_Renderer* renderer )
@@ -32,28 +32,46 @@ class Text : GObject
 
         // Color
         SDL_Color white = { 255, 255, 255 };
-        SDL_Color bg_c = { 0, 0, 0 };
+        SDL_Color bg_c  = { 0, 0, 0 };
+
+        // Content Rect
+        SDL_Rect text_location;
+        {
+            // Content Rect
+            SDL_Rect crect;
+            content_rect( &crect );
+
+            // Center Content Rect
+            //center_content_rect( crect );
+
+            //
+            int w;
+            int h;
+            if ( TTF_SizeText( font, text.toStringz, &w, &h ) )
+                throw new SDLException( "TTF_SizeText()" );
+
+            //
+            SDL_RenderSetClipRect( renderer, &crect );
+            text_location.x = crect.x;
+            text_location.y = crect.y;
+            text_location.w = w;
+            text_location.h = h;
+        }
 
         // Render
-        SDL_Surface* surface_message =
+        SDL_Surface* text_surface =
             TTF_RenderText_Solid( font, text.toStringz, white ); 
             //TTF_RenderText_Shaded( font, "Text", white, bg_c ); 
 
-        SDL_Texture* message = 
-            SDL_CreateTextureFromSurface( renderer, surface_message );
-
-        // Center
-        SDL_Rect message_rect = rect;
-        message_rect.w = rect.w - 16 - 16;
-        //message_rect.h = 16;
-        //message_rect.x = rect.x + ( rect.w - text_width() ) / 2;
+        SDL_Texture* text_texture = 
+            SDL_CreateTextureFromSurface( renderer, text_surface );
 
         // Copy
-        SDL_RenderCopy( renderer, message, null, &message_rect );
+        SDL_RenderCopy( renderer, text_texture, null, &text_location );
 
         TTF_CloseFont( font );
-        SDL_FreeSurface( surface_message );
-        SDL_DestroyTexture( message );
+        SDL_FreeSurface( text_surface );
+        SDL_DestroyTexture( text_texture );
 
         // Render childs
         render_childs( renderer );
