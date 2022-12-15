@@ -160,6 +160,21 @@ uint _timer_callback( uint interval, void* param )
 }
 
 
+class LBox : GObject
+{
+    //
+}
+
+class RBox : GObject
+{
+    //
+}
+
+class CBox : GObject
+{
+    //
+}
+
 class LMenuButton : Button
 {
     //
@@ -189,17 +204,40 @@ class RMenuButton : Button
 }
 
 
-class LBox : GObject
+class SoundIndicator : RMenuButton
 {
-    //
+    // icon
+    // mouse scroll up   - volume up
+    // mouse scroll down - volume down
+    override
+    size_t mouse_wheel( SDL_Event* e )
+    {
+        //
+        if ( e.wheel.y > 0 ) // scroll up
+        {
+             // Put code for handling "scroll up" here!
+             text = "up";
+        }
+
+        else 
+        if ( e.wheel.y < 0 ) // scroll down
+        {
+             // Put code for handling "scroll down" here!
+             text = "down";
+        }
+
+        if ( e.wheel.x > 0 ) // scroll right
+        {
+             // ...
+        }
+
+        else 
+        if ( e.wheel.x < 0 ) // scroll left
+        {
+             // ...
+        }
+
+        return super.mouse_wheel( e );
+    }    
 }
 
-class RBox : GObject
-{
-    //
-}
-
-class CBox : GObject
-{
-    //
-}

@@ -71,6 +71,17 @@ class Window
             }
         }
 
+        // SDL_MOUSEWHEEL
+        else
+        if ( e.type == SDL_MOUSEWHEEL )
+        {
+            if ( SDL_GetWindowID( window ) == e.wheel.windowID )
+            {
+                if ( tree !is null )
+                    return tree.main( e );
+            }
+        }
+
         // ANY
         else
         {

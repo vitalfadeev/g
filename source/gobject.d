@@ -42,6 +42,7 @@ class GObject : TreeObject
     {
         if ( e.type == SDL_MOUSEBUTTONDOWN ) return _mouse_button( e );
         if ( e.type == SDL_MOUSEBUTTONUP   ) return _mouse_button( e );
+        if ( e.type == SDL_MOUSEWHEEL      ) return _mouse_wheel( e );
         if ( e.type == OP.RENDER           ) return render( e );
         //if ( e.type == OP.DRAWED ) return this.drawed( e );
         return super.main( e );
@@ -52,6 +53,38 @@ class GObject : TreeObject
     {
         SDL_Point point = SDL_Point( x, y );
         return SDL_PointInRect( &point, &rect );
+    }
+
+
+    size_t _mouse_wheel( SDL_Event* e )
+    {
+        int x;
+        int y;
+        SDL_GetMouseState( &x, &y );
+        import tools;
+
+        if ( hit_test( x, y ) ) 
+            mouse_wheel( e );
+
+        return 0;
+    }
+
+
+    size_t mouse_wheel( SDL_Event* e )
+    {
+        // State
+        change_state( e );
+
+        // Styles
+        apply_styles_recursive( this );
+
+        // Remder
+        push_render();
+
+        // Childs
+        this.each_child_main( e );
+
+        return 0;
     }
 
 

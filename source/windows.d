@@ -20,7 +20,6 @@ void unmanage_window( Window window )
     import std.stdio;
     import tools;
     managed_windows = remove_element( managed_windows, window );
-    writeln( "XXX: ", "Unmanage window" );
 }
 
 

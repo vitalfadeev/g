@@ -146,7 +146,7 @@ void create_tree( ref Tree tree )
     rb1.rect.w = 64;
     rb1.layout_mode = LAYOUT_MODE.FIXED;
 
-    auto rb2 = new RMenuButton;
+    auto rb2 = new SoundIndicator;
     rbox.add_child( rb2 );
     rb2.text = "R2";
     rb2.rect.w = 64;
