@@ -171,7 +171,7 @@ class RMenuButton : Button
     override
     size_t click( SDL_Event* e )
     {
-        msgbox( "RMenuButton.click()");
+        //msgbox( "RMenuButton.click()");
         return 0;
     }
 
@@ -189,3 +189,17 @@ class RMenuButton : Button
 }
 
 
+class LBox : GObject
+{
+    //
+}
+
+class RBox : GObject
+{
+    //
+}
+
+class CBox : GObject
+{
+    //
+}

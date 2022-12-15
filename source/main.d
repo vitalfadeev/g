@@ -9,7 +9,6 @@ import gobject;
 import window;
 import windows;
 import panel;
-import hboxlayout;
 import bindbc.sdl;
 import bindbc.sdl.ttf;
 import sdlexception;
@@ -89,6 +88,14 @@ void create_tree( ref Tree tree )
 {
     tree = new Tree;
 
+    // +----------------------------------------------+ Panel
+    // | +------------+ +------------+ +------------+ | RBox, CBox, LBox
+    // | | +--------+ | | +--------+ | | +---++---+ | | LButton, Clock, RButton
+    // | | |        | | | |        | | | |   ||   | | |
+    // | | +--------+ | | +--------+ | | +---++---+ | |
+    // | +------------+ +------------+ +------------+ |
+    // +----------------------------------------------+
+
     // Panel
     auto panel = new Panel;
     tree.root = panel;
@@ -98,23 +105,57 @@ void create_tree( ref Tree tree )
     panel.h_mode = HMODE.FIXED;
     panel.rect.h = 29;
     panel.layout_mode = LAYOUT_MODE.HBOX;
-    
-    auto lmb  = new LMenuButton;
-    auto clck = new Clock;
-    auto rmb  = new RMenuButton;
-    panel.add_child( lmb  );
-    panel.add_child( clck );
-    panel.add_child( rmb  );
+    panel.layout_mode_hbox_same_width = true;
 
-    lmb.text = "LMenu";
-    rmb.text = "RMenu";
+    // Boxes    
+    auto lbox = new LBox;
+    auto cbox = new CBox;
+    auto rbox = new RBox;
+    panel.add_child( lbox );
+    panel.add_child( cbox );
+    panel.add_child( rbox );
+    lbox.layout_mode = LAYOUT_MODE.HBOX;
+    cbox.layout_mode = LAYOUT_MODE.HBOX;
+    rbox.layout_mode = LAYOUT_MODE.HBOX;
+    lbox.w_mode = WMODE.FIXED;
+    cbox.w_mode = WMODE.FIXED;
+    rbox.w_mode = WMODE.FIXED;
+    //lbox.rect.w = 1366/3;
+    //cbox.rect.w = 1366/3;
+    //rbox.rect.w = 1366/3;
+    //lbox.layout_mode_hbox_same_width = true;
+    lbox.layout_mode_hbox_same_width = true;
+    cbox.layout_mode_hbox_same_width = true;
+    rbox.layout_mode_hbox_same_width = true;
+
+    // L Buttons
+    auto lb1 = new LMenuButton;
+    lbox.add_child( lb1 );
+    lb1.layout_mode = LAYOUT_MODE.FIXED;
+    lb1.text = "LMenu";
+
+    // Clock
+    auto clk = new Clock;
+    cbox.add_child( clk );
+    clk.layout_mode = LAYOUT_MODE.FIXED;
+
+    // R Buttons
+    auto rb1 = new RMenuButton;
+    rbox.add_child( rb1 );
+    rb1.text = "R1";
+    rb1.rect.w = 64;
+    rb1.layout_mode = LAYOUT_MODE.FIXED;
+
+    auto rb2 = new RMenuButton;
+    rbox.add_child( rb2 );
+    rb2.text = "R2";
+    rb2.rect.w = 64;
+    rb2.layout_mode = LAYOUT_MODE.FIXED;
 
     // CSS
-    import style : create_style, apply_styles;
+    import style : create_style, apply_styles_recursive;
     create_style();
-    apply_styles( lmb );
-    apply_styles( clck );
-    apply_styles( rmb );
+    apply_styles_recursive( panel );
 }
 
 
@@ -158,7 +199,7 @@ void create_window( ref SDL_Window* window )
             "SDL2 Window",
             0,
             0,
-            1366, 96,
+            1366, 29,
             SDL_WINDOW_BORDERLESS
         );
 

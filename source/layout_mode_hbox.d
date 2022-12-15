@@ -1,4 +1,4 @@
-module hboxlayout;
+module layout_mode_hbox;
 
 import std.stdio;
 import std.typecons;
@@ -10,7 +10,7 @@ import defs;
 import layout;
 
 
-void hbox_layout( GObject o )
+void apply( GObject o )
 {
     // Content Rect
     SDL_Rect crect;
@@ -21,23 +21,23 @@ void hbox_layout( GObject o )
     foreach ( c; o.childs )
         childs_count++;
 
-    // Same witch
-    if ( o.layout_hbox_same_width )
-    {
-        int same_w = crect.w / childs_count;
-        foreach ( c; o.childs )
-            ( cast( GObject )c ).rect.w = same_w;
-    }
 
     // Layout
-    int x;
+    int x = crect.x;
     int y = crect.y;
     int h = crect.h;
+    int w =
+        ( o.layout_mode_hbox_same_width ) ?
+            ( crect.w / childs_count ) : // Same width
+            ( crect.w );
     foreach ( c; o.childs )
     {
         ( cast( GObject )c ).rect.x = x;
         ( cast( GObject )c ).rect.y = y;
-        x += ( cast( GObject )c ).rect.w;
         ( cast( GObject )c ).rect.h = h;
+        x += ( cast( GObject )c ).rect.w;
+
+        if ( o.layout_mode_hbox_same_width )
+            ( cast( GObject )c ).rect.w = w;
     }
 }

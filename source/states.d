@@ -6,10 +6,10 @@ import std.typecons;
 //
 enum States
 {
-    NORMAL   = 1 << 0,
-    PRESSED  = 1 << 1,
-    DISABLED = 1 << 2,
-    HOVER    = 1 << 3
+    NORMAL   =      0,
+    PRESSED  = 1 << 0,
+    DISABLED = 1 << 1,
+    HOVER    = 1 << 2
 }
 
 BitFlags!States STATE_NORMAL   = States.NORMAL;

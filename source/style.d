@@ -27,14 +27,13 @@ class Style1 : Style
     this()
     {
         class_name = "panel.RMenuButton";
-        state = STATE_NORMAL;
     }
 
     override
     void apply( GObject o )
     {
-        o.bg = SDL_Color(  48, 0,  48, SDL_ALPHA_OPAQUE );
-        o.fg = SDL_Color( 255, 0, 255, SDL_ALPHA_OPAQUE );
+        ( cast( GObject )o ).bg = SDL_Color(    0,  0,     0, SDL_ALPHA_OPAQUE );
+        ( cast( GObject )o ).fg = SDL_Color(  200,  200, 200, SDL_ALPHA_OPAQUE );
     }
 }
 
@@ -44,14 +43,13 @@ class Style2 : Style
     this()
     {
         class_name = "panel.LMenuButton";
-        state = STATE_NORMAL;
     }
 
     override
     void apply( GObject o )
     {
-        o.bg = SDL_Color( 0,  48,  48, SDL_ALPHA_OPAQUE );
-        o.fg = SDL_Color( 0, 255, 255, SDL_ALPHA_OPAQUE );
+        ( cast( GObject )o ).bg = SDL_Color(    0,  0,     0, SDL_ALPHA_OPAQUE );
+        ( cast( GObject )o ).fg = SDL_Color(  200,  200, 200, SDL_ALPHA_OPAQUE );
     }
 }
 
@@ -77,22 +75,74 @@ class Style4 : Style
     this()
     {
         class_name = "panel.Clock";
-        state = STATE_NORMAL;
     }
 
     override
     void apply( GObject o )
     {
         import panel;
-        ( cast( Clock )o ).font_file = "InputSansCondensed-Regular.ttf";
-        ( cast( Clock )o ).font_size = 24;
-        ( cast( Clock )o ).padding_t = 1;
-        ( cast( Clock )o ).padding_b = 1;
-        ( cast( Clock )o ).bg = SDL_Color(  48,  48, 0, SDL_ALPHA_OPAQUE );
-        ( cast( Clock )o ).fg = SDL_Color(  48,  48, 0, SDL_ALPHA_OPAQUE );
+        ( cast( Clock   )o ).font_file = "InputSansCondensed-Regular.ttf";
+        ( cast( Clock   )o ).font_size = 24;
+        ( cast( GObject )o ).padding_t = 1;
+        ( cast( GObject )o ).padding_b = 1;
+        ( cast( GObject )o ).bg = SDL_Color(    0,  0,     0, SDL_ALPHA_OPAQUE );
+        ( cast( GObject )o ).fg = SDL_Color(  200,  200, 200, SDL_ALPHA_OPAQUE );
     }
 }
 
+class Style5 : Style
+{
+    this()
+    {
+        class_name = "panel.LBox";
+    }
+
+    override
+    void apply( GObject o )
+    {
+        import panel;
+        ( cast( GObject )o ).padding_t = 0;
+    }
+}
+
+class Style6 : Style
+{
+    this()
+    {
+        class_name = "panel.CBox";
+    }
+
+    override
+    void apply( GObject o )
+    {
+        import panel;
+        ( cast( GObject )o ).padding_t = 0;
+    }
+}
+
+class Style7 : Style
+{
+    this()
+    {
+        class_name = "panel.RBox";
+    }
+
+    override
+    void apply( GObject o )
+    {
+        import panel;
+        ( cast( GObject )o ).padding_t = 0;
+    }
+}
+
+//
+void apply_styles_recursive( GObject cur )
+{
+    apply_styles( cur );
+
+    foreach ( c; cur.childs )
+        ( cast( GObject )c ).apply_styles_recursive();
+}
 
 //
 void apply_styles( GObject o )
@@ -149,6 +199,9 @@ void create_style()
     styles ~= new Style2();
     styles ~= new Style3();
     styles ~= new Style4();    
+    styles ~= new Style5();    
+    styles ~= new Style6();    
+    styles ~= new Style7();    
 }
 
 //

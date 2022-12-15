@@ -8,7 +8,7 @@ import style;
 import states;
 import treeobject;
 import sdlexception;
-import hboxlayout;
+import layout_mode_hbox;
 
 
 class GObject : TreeObject
@@ -29,7 +29,12 @@ class GObject : TreeObject
     BitFlags!States state;
 
     LAYOUT_MODE layout_mode;
-    bool layout_hbox_same_width = true;
+    bool  layout_mode_hbox_same_width = true;
+    bool  layout_mode_hbox_fixed_width = false;
+    int   layout_mode_hbox_child_width = 0; // px
+    //WMODE layout_mode_hbox_child_w_mode = WMODE.FIXED;
+
+    bool borders_enable;
 
 
     override
@@ -65,7 +70,7 @@ class GObject : TreeObject
         change_state( e );
 
         // Styles
-        apply_styles( this );
+        apply_styles_recursive( this );
 
         // Remder
         push_render();
@@ -114,6 +119,15 @@ class GObject : TreeObject
             SDL_GetCurrentDisplayMode( 0, &display_mode );
             rect.w = display_mode.w;
         }
+
+        //
+        else
+        if ( w_mode == WMODE.FIXED )
+        {
+            //
+        }
+
+
         if ( h_mode == HMODE.DISPLAY )
         {        
             SDL_DisplayMode display_mode;
@@ -124,7 +138,7 @@ class GObject : TreeObject
         //
         switch ( layout_mode )
         {
-            case LAYOUT_MODE.HBOX: hbox_layout( this ); break;
+            case LAYOUT_MODE.HBOX: layout_mode_hbox.apply( this ); break;
             default:
         }
 
@@ -162,8 +176,11 @@ class GObject : TreeObject
     void render_borders( SDL_Renderer* renderer )
     {
         // borders rect x, y, w, h
-        SDL_SetRenderDrawColor( renderer, fg.r, fg.g, fg.b, fg.a  );
-        SDL_RenderDrawRect( renderer, &rect );
+        if ( borders_enable )
+        {        
+            SDL_SetRenderDrawColor( renderer, fg.r, fg.g, fg.b, fg.a  );
+            SDL_RenderDrawRect( renderer, &rect );
+        }
     }
 
 
@@ -262,6 +279,7 @@ enum HMODE
     FIXED,
     BY_CHILD,
     DISPLAY,
+    PARENT,
 }
 
 enum WMODE
@@ -269,11 +287,13 @@ enum WMODE
     FIXED,
     BY_CHILD,
     DISPLAY,
+    PARENT,
 }
 
 
 enum LAYOUT_MODE
 {
+    FIXED,
     LEFT,
     RIGHT,
     CENTER,
