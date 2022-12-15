@@ -10,31 +10,34 @@ import defs;
 import layout;
 
 
-class HBoxLayout : Layout
+void hbox_layout( GObject o )
 {
-    bool same_width = true;
+    // Content Rect
+    SDL_Rect crect;
+    o.content_rect( &crect );
 
-    override
-    void layout()
+    // Count childs
+    int childs_count;
+    foreach ( c; o.childs )
+        childs_count++;
+
+    // Same witch
+    if ( o.layout_hbox_same_width )
     {
-        //
-        int childs_count;
-        foreach ( c; childs )
-            childs_count++;
+        int same_w = crect.w / childs_count;
+        foreach ( c; o.childs )
+            ( cast( GObject )c ).rect.w = same_w;
+    }
 
-        //
-        int w = rect.w / childs_count;
-        foreach ( c; childs )
-            ( cast( GObject )c ).rect.w = w;
-
-        //
-        int x;
-        int h = rect.h;
-        foreach ( c; childs )
-        {
-            ( cast( GObject )c ).rect.x = x;
-            x += ( cast( GObject )c ).rect.w;
-            ( cast( GObject )c ).rect.h = h;
-        }
+    // Layout
+    int x;
+    int y = crect.y;
+    int h = crect.h;
+    foreach ( c; o.childs )
+    {
+        ( cast( GObject )c ).rect.x = x;
+        ( cast( GObject )c ).rect.y = y;
+        x += ( cast( GObject )c ).rect.w;
+        ( cast( GObject )c ).rect.h = h;
     }
 }

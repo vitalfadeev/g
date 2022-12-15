@@ -85,7 +85,11 @@ class Style4 : Style
     {
         import panel;
         ( cast( Clock )o ).font_file = "InputSansCondensed-Regular.ttf";
-        ( cast( Clock )o ).font_size = 32;
+        ( cast( Clock )o ).font_size = 24;
+        ( cast( Clock )o ).padding_t = 1;
+        ( cast( Clock )o ).padding_b = 1;
+        ( cast( Clock )o ).bg = SDL_Color(  48,  48, 0, SDL_ALPHA_OPAQUE );
+        ( cast( Clock )o ).fg = SDL_Color(  48,  48, 0, SDL_ALPHA_OPAQUE );
     }
 }
 

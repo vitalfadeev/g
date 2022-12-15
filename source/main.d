@@ -92,50 +92,22 @@ void create_tree( ref Tree tree )
     // Panel
     auto panel = new Panel;
     tree.root = panel;
-    panel.h_mode = HMODE.FIXED;
     panel.rect.x = 0;
     panel.rect.y = 0;
-    SDL_DisplayMode display_mode;
-    SDL_GetCurrentDisplayMode( 0, &display_mode );
-    panel.rect.w = display_mode.w; // 1366
-    panel.rect.h = 32;
-
-    auto hbox = new HBoxLayout;
-    hbox.rect.w = panel.rect.w;
-    hbox.rect.h = panel.rect.h;
-    panel.add_child( hbox );
+    panel.w_mode = WMODE.DISPLAY;
+    panel.h_mode = HMODE.FIXED;
+    panel.rect.h = 29;
+    panel.layout_mode = LAYOUT_MODE.HBOX;
     
     auto lmb  = new LMenuButton;
-    auto rmb  = new RMenuButton;
     auto clck = new Clock;
-    hbox.add_child( lmb );
-    hbox.add_child( clck  );
-    hbox.add_child( rmb  );
+    auto rmb  = new RMenuButton;
+    panel.add_child( lmb  );
+    panel.add_child( clck );
+    panel.add_child( rmb  );
 
-    lmb.rect.x = 0;
-    lmb.rect.y = 0;
-    lmb.rect.w = 256;
-    lmb.rect.h = 64;
     lmb.text = "LMenu";
-    //lmb.bg = SDL_Color( 0,  48,  48, SDL_ALPHA_OPAQUE );
-    //lmb.fg = SDL_Color( 0, 255, 255, SDL_ALPHA_OPAQUE );
-
-    rmb.rect.x = 1366 - 256;
-    rmb.rect.y = 0;
-    rmb.rect.w = 256;
-    rmb.rect.h = 64;
     rmb.text = "RMenu";
-    //rmb.bg = SDL_Color(  48, 0,  48, SDL_ALPHA_OPAQUE );
-    //rmb.fg = SDL_Color( 255, 0, 255, SDL_ALPHA_OPAQUE );
-
-    clck.rect.x = ( 1366 - 256 ) / 2;
-    clck.rect.y = 0;
-    clck.rect.w = 256;
-    clck.rect.h = 64;
-    clck.bg = SDL_Color(  48,  48, 0, SDL_ALPHA_OPAQUE );
-    clck.fg = SDL_Color( 255, 255, 0, SDL_ALPHA_OPAQUE );
-    clck.padding_t = 5;
-    clck.padding_b = 5;
 
     // CSS
     import style : create_style, apply_styles;
@@ -270,93 +242,7 @@ void obj_windows_main( GObject obj, SDL_Event* e )
         w.main( e );
 }
 
-
-
-//
-class Operations
-{
-    OperationStore store;
-}
-
-
-struct Op
-{
-    size_t opcode;
-    size_t arg;
-}
-
-
-class OperationStore
-{
-    Op[] store;
-    Op*  start;
-    Op*  end;
-
-    this()
-    {
-        store = new Op[](OP_STORE_SIZE);
-    }
-
-
-    bool empty()
-    {
-        return (start == end);
-    }
-
-
-    auto limit()
-    {
-        return store.ptr + store.length;
-    }
-
-
-    void put( Op op )
-    {
-        // check free space
-        if ( 
-            ( start < end ) && ( end < limit ) ||
-            ( start > end ) && ( start - end > 0 )
-           )
-        {
-            // yes free
-        }
-
-        //
-        if ( start == end )
-        {
-            *end = op;
-            end += 1;
-        }
-    }
-}
-
-// mode 1
-// --------------------------
-// ^
-// start
-// end
-
-// mode 2
-// ============--------------
-// ^          ^
-// start
-//           end
-
-// mode 3
-// ==========================
-// ^                        ^
-// start
-//                        end
-
-// mode 4
-// ====----------============
-//    ^          ^           
-//             start
-//   end                    
-
-// mode 5
-// ==========================
-//              ^^           
-//               start
-//            end                    
-
+// SafeHandle!(SDL_Window,SDL_DestroyWindow)
+// SafeHandle!(SDL_Surface,SDL_FreeSurface)
+// SafeHandle!(SDL_Texture,SDL_DestroyTexture)
+// SafeHandle!(SDL_Renderer,SDL_DestroyRenderer)

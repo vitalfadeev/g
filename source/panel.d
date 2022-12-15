@@ -169,39 +169,20 @@ class LMenuButton : Button
 class RMenuButton : Button
 {
     override
-    size_t mouse_button( SDL_Event* e )
+    size_t click( SDL_Event* e )
     {
-        // State
-        change_state( e );
+        msgbox( "RMenuButton.click()");
+        return 0;
+    }
 
-        // Styles
-        apply_styles( this );
 
-        // Remder
-        push_render();
+    override
+    size_t show_context_menu( SDL_Event* e, SDL_Window* cur_window, SDL_Point* at_point )
+    {
+        super.show_context_menu( e, cur_window, at_point );
 
-        // Popup
-        if ( e.button.type == SDL_MOUSEBUTTONDOWN )
-        if ( e.button.button == SDL_BUTTON_RIGHT )
-        {
-            import popupmenu;
-
-            SDL_Window* window;
-            window = SDL_GetWindowFromID( e.button.windowID );
-
-            int wx;
-            int wy;
-            SDL_GetWindowPosition( window, &wx, &wy );
-
-            SDL_Point at_point;
-            at_point.x = e.button.x + wx;
-            at_point.y = e.button.y + wy;
-
-            create_popup_menu( &at_point );
-        }
-
-        // Childs
-        this.each_child_main( e );
+        import popupmenu;
+        create_popup_menu( at_point );
 
         return 0;
     }

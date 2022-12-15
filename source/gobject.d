@@ -8,6 +8,7 @@ import style;
 import states;
 import treeobject;
 import sdlexception;
+import hboxlayout;
 
 
 class GObject : TreeObject
@@ -26,6 +27,9 @@ class GObject : TreeObject
     int padding_b; // bottom
 
     BitFlags!States state;
+
+    LAYOUT_MODE layout_mode;
+    bool layout_hbox_same_width = true;
 
 
     override
@@ -69,6 +73,24 @@ class GObject : TreeObject
         // Childs
         this.each_child_main( e );
 
+        // Context Menu
+        if ( e.button.type == SDL_MOUSEBUTTONDOWN )
+        if ( e.button.button == SDL_BUTTON_RIGHT )
+        {
+            SDL_Window* cur_window;
+            cur_window = SDL_GetWindowFromID( e.button.windowID );
+
+            int wx;
+            int wy;
+            SDL_GetWindowPosition( cur_window, &wx, &wy );
+
+            SDL_Point at_point;
+            at_point.x = e.button.x + wx;
+            at_point.y = e.button.y + wy;
+
+            return show_context_menu( e, cur_window, &at_point );
+        }
+
         return 0;
     }
 
@@ -85,10 +107,28 @@ class GObject : TreeObject
 
     void layout()
     {
-        // Self layout
-        // ...
+        // Layout This
+        if ( w_mode == WMODE.DISPLAY )
+        {        
+            SDL_DisplayMode display_mode;
+            SDL_GetCurrentDisplayMode( 0, &display_mode );
+            rect.w = display_mode.w;
+        }
+        if ( h_mode == HMODE.DISPLAY )
+        {        
+            SDL_DisplayMode display_mode;
+            SDL_GetCurrentDisplayMode( 0, &display_mode );
+            rect.h = display_mode.h;
+        }
 
-        // Childs layout
+        //
+        switch ( layout_mode )
+        {
+            case LAYOUT_MODE.HBOX: hbox_layout( this ); break;
+            default:
+        }
+
+        // Layout Childs
         foreach( c; childs )
             ( cast( GObject )c ).layout();
     }
@@ -165,38 +205,54 @@ class GObject : TreeObject
 
 
     //
-    void center_content_rect( SDL_Rect* crect )
+    void center_1_child()
     {
-        // center_rect_in_rect()
+        //
     }
 
 
     //
-    void center_rect_in_rect( SDL_Rect* small_rect, SDL_Rect* big_rect )
+    void center_all_childs()
     {
-        // center_x()
-        // center_y()
-
-            //// Center: Lon[g t]ext
-            //if ( w > crect.w )
-            //{
-            //    SDL_RenderSetClipRect( renderer, &crect );
-            //    text_location.x = crect.x;
-            //    text_location.y = crect.y;
-            //    text_location.w = w;
-            //    text_location.h = h;
-            //}
-
-            //// Center: [ Short text ]
-            //else
-            //{
-            //    SDL_RenderSetClipRect( renderer, &crect );
-            //    text_location.x = crect.x + ( crect.w - w ) / 2;
-            //    text_location.y = crect.y + ( crect.h - h ) / 2;
-            //    text_location.w = w;
-            //    text_location.h = h;
-            //}
+        //
     }
+
+
+    //
+    size_t show_context_menu( SDL_Event* e, SDL_Window* cur_window, SDL_Point* at_point )
+    {
+        return 0;
+    }
+}
+
+
+//
+void center_rect_in_rect( SDL_Rect* inner_rect, SDL_Rect* outer_rect )
+{
+    void center_x( SDL_Rect* inner_rect, SDL_Rect* outer_rect )
+    {
+        // Center: Lon[g t]ext
+        if ( inner_rect.w > outer_rect.w )
+            inner_rect.x = outer_rect.x - ( inner_rect.w - outer_rect.w ) / 2;
+
+        // Center: [ Short text ]
+        else
+            inner_rect.x = outer_rect.x + ( outer_rect.w - inner_rect.w ) / 2;
+    }
+
+    void center_y( SDL_Rect* inner_rect, SDL_Rect* outer_rect )
+    {
+        // Center: Lon[g t]ext
+        if ( inner_rect.h > outer_rect.h )
+            inner_rect.y = outer_rect.y - ( inner_rect.h - outer_rect.h ) / 2;
+
+        // Center: [ Short text ]
+        else
+            inner_rect.y = outer_rect.y + ( outer_rect.h - inner_rect.h ) / 2;
+    }
+
+    center_x( inner_rect, outer_rect );
+    center_y( inner_rect, outer_rect );
 }
 
 
@@ -205,10 +261,28 @@ enum HMODE
 {
     FIXED,
     BY_CHILD,
+    DISPLAY,
 }
 
 enum WMODE
 {
     FIXED,
     BY_CHILD,
+    DISPLAY,
+}
+
+
+enum LAYOUT_MODE
+{
+    LEFT,
+    RIGHT,
+    CENTER,
+    HBOX,
+    VBOX,
+}
+
+
+void layout_LEFT( GObject o )
+{
+    //
 }

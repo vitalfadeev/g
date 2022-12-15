@@ -35,27 +35,27 @@ class Text : GObject
         SDL_Color bg_c  = { 0, 0, 0 };
 
         // Content Rect
-        SDL_Rect text_location;
+        SDL_Rect trect;
         {
             // Content Rect
             SDL_Rect crect;
             content_rect( &crect );
 
-            // Center Content Rect
-            //center_content_rect( crect );
-
-            //
+            // Text Rect
             int w;
             int h;
             if ( TTF_SizeText( font, text.toStringz, &w, &h ) )
                 throw new SDLException( "TTF_SizeText()" );
+            trect.x = crect.x;
+            trect.y = crect.y;
+            trect.w = w;
+            trect.h = h;
 
-            //
+            // Center Text inside Content Rect
+            center_rect_in_rect( &trect, &crect );
+
+            // Clip
             SDL_RenderSetClipRect( renderer, &crect );
-            text_location.x = crect.x;
-            text_location.y = crect.y;
-            text_location.w = w;
-            text_location.h = h;
         }
 
         // Render
@@ -67,8 +67,10 @@ class Text : GObject
             SDL_CreateTextureFromSurface( renderer, text_surface );
 
         // Copy
-        SDL_RenderCopy( renderer, text_texture, null, &text_location );
+        SDL_RenderCopy( renderer, text_texture, null, &trect );
 
+        // Free
+        SDL_RenderSetClipRect( renderer, null );
         TTF_CloseFont( font );
         SDL_FreeSurface( text_surface );
         SDL_DestroyTexture( text_texture );

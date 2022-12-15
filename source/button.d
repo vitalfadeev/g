@@ -36,6 +36,10 @@ class Button : GObject
     {
         super.mouse_button( e );
 
+        if ( e.type == SDL_MOUSEBUTTONDOWN )
+        if ( e.button.button == SDL_BUTTON_LEFT )
+            return click( e );
+
         return 0;
     }
 
