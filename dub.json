@@ -4,9 +4,16 @@
 	"authors"        : [ "vital" ],
 	"copyright"      : "Copyright © 2022, vital",
 	"license"        : "proprietary",
-	"dependencies"   : {
-		"bindbc-sdl"   : "~>1.2.3"
+	"dependencies"   : 
+	{
+		"bindbc-sdl" : "~>1.2.3"
 	},
-	"preRunCommands" : [ "start /WAIT /MIN cmd /C \"QPROCESS g.exe && TASKKILL /IM g.exe\"" ],
-	"versions"       : [ "SDL_2022", "SDL_TTF", "SDL_TTF_2018" ]
+	"preRunCommands" : [ "start /WAIT /MIN /B TASKKILL /IM g.exe" ],
+	"versions"       : 
+	[ 
+		"Windows10",
+		"SDL_2022", 
+		"SDL_TTF", "SDL_TTF_2018", 
+		"SDL_Image", "SDL_Image_205"
+	]
 }

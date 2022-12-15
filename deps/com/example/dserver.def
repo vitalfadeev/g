@@ -1,0 +1,9 @@
+LIBRARY         dserver
+EXETYPE         NT
+SUBSYSTEM       WINDOWS
+EXPORTS
+	DllGetClassObject
+	DllCanUnloadNow
+	DllRegisterServer
+	DllUnregisterServer
+

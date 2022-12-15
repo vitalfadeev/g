@@ -80,6 +80,21 @@ void init_sdl()
 
     if ( TTF_Init() )
         throw new Exception( "ERR: TTF_Init()" );
+
+    // Image
+    SDLImageSupport ret_image = loadSDLImage();
+
+    if ( ret_image != sdlImageSupport )
+    {
+        if ( ret_image == SDLImageSupport.noLibrary ) 
+            throw new Exception( "The SDL_Image shared library failed to load" );
+        else if ( SDLImageSupport.badLibrary ) 
+            throw new Exception( "One or more symbols failed to load. The likely cause is that the shared library is for a lower version than bindbc-sdl was configured to load (via SDL_Image_2018, etc.)" );
+    }
+
+    auto flags = IMG_INIT_PNG | IMG_INIT_JPG;
+    if( IMG_Init( flags ) != flags )
+        throw new Exception( "ERR: IMG_Init()" );
 }
 
 
@@ -235,7 +250,7 @@ void event_loop()
     {
         SDL_Event e;
 
-        while ( SDL_PollEvent( &e ) > 0 ) 
+        while ( SDL_WaitEvent( &e ) > 0 ) 
         {
             // QUIT
             if ( e.type == SDL_QUIT ) 

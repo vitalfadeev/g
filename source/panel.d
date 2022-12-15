@@ -3,6 +3,7 @@ module panel;
 import std.conv;
 import std.format;
 import std.stdio;
+import std.string;
 import bindbc.sdl;
 import tree;
 import treeobject;
@@ -13,6 +14,7 @@ import button;
 import text;
 import tools;
 import style;
+import sdlexception;
 
 
 class Panel : GObject
@@ -204,8 +206,29 @@ class RMenuButton : Button
 }
 
 
+import sound : Sound;
+import was   : CAudioEndpointVolumeCallback, VolumeMonitor, IAudioEndpointVolumeCallback;
+// RegisterSystemNotificationCallback();
+// CAudioEndpointVolumeCallback callback;
+// VolumeMonitor                monitor;
+//
+//void RegisterSystemNotificationCallback()
+//{
+//    auto callback = new CAudioEndpointVolumeCallback( &onMasterVolumeChanged );
+//    auto monitor = new VolumeMonitor( callback );
+//}
+//
+//extern ( D )
+//void onMasterVolumeChanged( float level )
+//{
+//    UpdateSoundIcon( false, level );
+//    RePaint();
+//}
+
 class SoundIndicator : RMenuButton
 {
+    string icon;
+
     // icon
     // mouse scroll up   - volume up
     // mouse scroll down - volume down
@@ -217,6 +240,7 @@ class SoundIndicator : RMenuButton
         {
              // Put code for handling "scroll up" here!
              text = "up";
+             try_volume_up();
         }
 
         else 
@@ -224,6 +248,7 @@ class SoundIndicator : RMenuButton
         {
              // Put code for handling "scroll down" here!
              text = "down";
+             try_volume_down();
         }
 
         if ( e.wheel.x > 0 ) // scroll right
@@ -238,6 +263,129 @@ class SoundIndicator : RMenuButton
         }
 
         return super.mouse_wheel( e );
-    }    
+    }
+
+
+    void try_volume_up()
+    {
+        //if ( Sound.MasterVolumePageUp() )
+        //  render()
+        sys_mixer.try_volume_up();
+
+        update_icon();
+    }
+
+
+    void try_volume_down()
+    {
+        //if ( Sound.MasterVolumePageDown() )
+        //  render()
+        sys_mixer.try_volume_down();
+
+        update_icon();
+    }
+
+
+    void update_icon()
+    {
+        float level = get_current_volume();
+
+        text = ( level * 100 ).to!string;
+
+        if ( level == 0 )
+            icon = "disabled";
+        else if ( level == 0 )
+            icon = "mute";
+        else if ( level < .25 )
+            icon = "audio-25";
+        else if ( level < .50 )
+            icon = "audio-50";
+        else if ( level < .75 )
+            icon = "audio-75";
+        else if ( level == 1.0 )
+            icon = "audio-100";        
+    }
+
+
+    float get_current_volume()
+    {
+        return sys_mixer.get_current_volume();
+    }
+
+
+    override
+    void render( SDL_Renderer* renderer )
+    {
+        super.render( renderer );
+        _render( renderer );
+    }
+
+
+    void _render( SDL_Renderer* renderer )
+    {
+         render_icon( renderer, icon );
+    }
+
+
+    void render_icon( SDL_Renderer* renderer, string icon_file_name )
+    {
+        if ( icon_file_name.length == 0 )
+            return;
+
+        string real_file = "audio-status\\" ~ icon_file_name ~ ".png";
+
+        // SDL_IMG
+        SDL_Surface* img_surface = IMG_Load( real_file.toStringz );
+
+        if ( img_surface is null ) 
+        {
+            import std.format;
+            throw new SDLException( 
+                format!
+                    "could not load image: %s"
+                    ( IMG_GetError() )
+            );
+        }
+
+        // 
+        SDL_Rect imgrect;
+        imgrect.x = rect.x + 55;
+        imgrect.y = rect.y;
+        imgrect.w = 28;
+        imgrect.h = 28;
+
+        //
+        SDL_Texture* img_texture = 
+            SDL_CreateTextureFromSurface( renderer, img_surface );
+
+        // Copy
+        SDL_RenderCopy( renderer, img_texture, null, &imgrect );
+
+        //
+        SDL_FreeSurface( img_surface );
+        SDL_DestroyTexture( img_texture );
+    }
 }
 
+
+struct SysMixer
+{
+    void try_volume_up()
+    {
+        Sound.master_volume_page_up();
+    }
+
+
+    void try_volume_down()
+    {
+        Sound.master_volume_page_down();
+    }
+
+
+    float get_current_volume()
+    {
+        return Sound.get_master_volume();
+    }
+}
+
+SysMixer sys_mixer;
