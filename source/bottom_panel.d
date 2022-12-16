@@ -30,37 +30,26 @@ class BottomPanel : GObject
 
 class AppButton : Button
 {
-    override
-    size_t main( SDL_Event* e )
-    {
-        return super.main( e );
-    }
+    //override
+    //size_t main( SDL_Event* e )
+    //{
+    //    return super.main( e );
+    //}
 
-    override
-    size_t mouse_button( SDL_Event* e )
-    {
-        writeln( this, ": ", e.type );
+    //override
+    //size_t mouse_button( SDL_Event* e )
+    //{
+    //    // State
+    //    change_state( e );
 
-        // State
-        change_state( e );
+    //    // Styles
+    //    apply_styles_recursive( this );
 
-        // Styles
-        apply_styles_recursive( this );
+    //    // Remder
+    //    push_render();
 
-        // Remder
-        push_render();
-
-        // Childs
-        return this.each_child_main( e );
-    }
-
-
-    override
-    void render( SDL_Renderer* renderer )
-    {
-        writeln( this, ": ", renderer );
-
-        super.render( renderer );
-    }
+    //    // Childs
+    //    return this.each_child_main( e );
+    //}
 }
 

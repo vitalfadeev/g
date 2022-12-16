@@ -135,6 +135,36 @@ class Style7 : Style
     }
 }
 
+class Style8 : Style
+{
+    this()
+    {
+        class_name = "bottom_panel.AppButton";
+    }
+
+    override
+    void apply( GObject o )
+    {
+        ( cast( GObject )o ).bg = SDL_Color( 0, 0, 0, SDL_ALPHA_OPAQUE );
+    }
+}
+
+
+class Style9 : Style
+{
+    this()
+    {
+        class_name = "bottom_panel.AppButton";
+        state = STATE_PRESSED;
+    }
+
+    override
+    void apply( GObject o )
+    {
+        o.bg = SDL_Color(  48,  48, 48, SDL_ALPHA_OPAQUE );
+    }
+}
+
 //
 void apply_styles_recursive( GObject cur )
 {
@@ -198,10 +228,12 @@ void create_style()
     styles ~= new Style1();
     styles ~= new Style2();
     styles ~= new Style3();
-    styles ~= new Style4();    
-    styles ~= new Style5();    
-    styles ~= new Style6();    
-    styles ~= new Style7();    
+    styles ~= new Style4();
+    styles ~= new Style5();
+    styles ~= new Style6();
+    styles ~= new Style7();
+    styles ~= new Style8();
+    styles ~= new Style9();
 }
 
 //
