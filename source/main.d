@@ -197,18 +197,23 @@ void create_tree2( ref Root root, ref BottomPanel panel2 )
     panel2 = new BottomPanel;
     root.add_child( panel2 );
     panel2.rect.x = 0;
-    panel2.rect.y = 200; // 768 - 96 - 100;
+    panel2.rect.y = 0; // 768 - 96 - 100;
     panel2.w_mode = WMODE.DISPLAY;
     panel2.h_mode = HMODE.FIXED;
     panel2.rect.h = 96;
     panel2.layout_mode  = LAYOUT_MODE.HBOX;
+    //panel2.layout_mode  = LAYOUT_MODE.FIXED;
     panel2.childs_align = CHILDS_ALIGN.CENTER;
 
     auto ab1 = new AppButton;
     panel2.add_child( ab1 );
     ab1.text = "App";
+    ab1.rect.x = ( 1366-96 )/2;
+    ab1.rect.y = 0;
     ab1.w_mode = WMODE.FIXED;
     ab1.rect.w = 96;
+    ab1.h_mode = HMODE.FIXED;
+    ab1.rect.h = 96;
     ab1.layout_mode = LAYOUT_MODE.FIXED;
     ab1.borders_enable = true;
 }

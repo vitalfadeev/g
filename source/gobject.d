@@ -92,6 +92,9 @@ class GObject : TreeObject
 
     size_t _mouse_button( SDL_Event* e )
     {
+        //writeln( this, ": ", e.type );
+        //writeln( this, ":   ", e.button.x, ", ", e.button.y );
+        //writeln( this, ":   ", rect.x, ", ", rect.y, " ", rect.w, "x", rect.h );
         if ( hit_test( e.button.x, e.button.y ) ) 
             mouse_button( e );
 

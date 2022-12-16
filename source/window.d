@@ -21,6 +21,7 @@ class Window
     GObject       root;
     SDL_Renderer* renderer;
 
+
     this( SDL_Window* window, GObject root, SDL_Renderer* renderer )
     {
         this.window   = window;
@@ -28,18 +29,20 @@ class Window
         this.renderer = renderer;
     }
 
+
     ~this()
     {
         SDL_DestroyRenderer( renderer );
         SDL_DestroyWindow( window );
     }
 
+
     size_t main( SDL_Event* e )
     {
-        // SDL_WINDOWEVENT
-        if ( e.type == SDL_WINDOWEVENT )
+        if ( is_event_for_me( e ) )
         {
-            if ( SDL_GetWindowID( window ) == e.window.windowID )
+            // SDL_WINDOWEVENT
+            if ( e.type == SDL_WINDOWEVENT )
             {
                 // SDL_WINDOWEVENT_CLOSE
                 if ( e.window.event == SDL_WINDOWEVENT_CLOSE )
@@ -57,6 +60,26 @@ class Window
                     //
                 }
             }
+
+            // ANY
+            else
+            {
+                if ( root !is null )
+                    return root.main( e );
+            }
+        }
+
+        return 0;
+    }
+
+
+    bool is_event_for_me( SDL_Event* e )
+    {
+        // SDL_WINDOWEVENT
+        if ( e.type == SDL_WINDOWEVENT )
+        {
+            if ( SDL_GetWindowID( window ) == e.window.windowID )
+                return true;
         }
 
         // SDL_MOUSEBUTTONDOWN
@@ -66,8 +89,7 @@ class Window
             ( e.type == SDL_MOUSEBUTTONUP ))
         {
             if ( SDL_GetWindowID( window ) == e.button.windowID )
-                if ( root !is null )
-                    return root.main( e );
+                return true;
         }
 
         // SDL_MOUSEWHEEL
@@ -75,16 +97,9 @@ class Window
         if ( e.type == SDL_MOUSEWHEEL )
         {
             if ( SDL_GetWindowID( window ) == e.wheel.windowID )
-                if ( root !is null )
-                    return root.main( e );
+                return true;
         }
 
-        // ANY
-        else
-        {
-            //
-        }
-        
-        return 0;
+        return false;
     }
 }
