@@ -1,19 +1,37 @@
 module duit;
 
 import std.algorithm;
+import std.typecons;
 import std.uni;
 import std.stdio;
 import std.string;
 import std.array;
 import std.conv;
-import root;
-import gobject;
 import std.range;
 import std.functional;
+import std.traits;
+import bindbc.sdl;
+import root;
+import gobject;
+import states;
+import button;
+
+void test()
+{
+    auto root = read_file( "test.duit" );
+    dump_tree2( root );
+}
 
 void test1()
 {
-    auto root = read_file( "test.duit" );
+    auto root = read_file( "panel1.duit" );
+    dump_tree2( root );
+}
+
+
+void test2()
+{
+    auto root = read_file( "panel2.duit" );
     dump_tree2( root );
 }
 
@@ -66,6 +84,7 @@ GObject read_file( string file_name )
             continue;
 
         parse_line( newst, line );
+        //write(line);
 
         if ( newst.indent > st.indent )
             e = e;
@@ -74,9 +93,8 @@ GObject read_file( string file_name )
         else if ( newst.indent == st.indent )
             e = find_parent( indents, newst.indent, e );
 
-        if ( newst.has_eq ) {
-            //assign_property( e, newst.property, newst.value );
-        }
+        if ( newst.has_eq )
+            assign_property( e, newst.property, newst.value );
         else
             e = add_child( indents, newst.indent, e, newst.name );
 
@@ -135,7 +153,8 @@ class IndRec
 
 GObject add_child( ref IndRec[] indents, size_t indent, GObject e, string name )
 {
-    auto c = new GObject();
+    //auto c = new GObject(); // = cast( GObject ) Object.factory( name );
+    auto c = cast( GObject ) Object.factory( name );
     c.duit_class = name;
     indents ~= new IndRec( indent, c );
     e.add_child( c );
@@ -159,24 +178,31 @@ GObject find_parent( ref IndRec[] indents, size_t indent, GObject e )
     return cur.e;
 }
 
-/*
 void assign_property( GObject e, string property, string value )
 {
     // property = value
 
     static
-    foreach ( p; Properties!GObject )
+    foreach ( p; FieldNameTuple!GObject )
     {
-        if ( p == property ) asgn_property!p( e, value );
+        if ( p == property ) { asgn_property!p( e, value ); return; }
     }
+
+    if ( property == "rect.w" ) { e.rect.w = value.to!(typeof(e.rect.w)); return; }
+    if ( property == "rect.x" ) { e.rect.x = value.to!(typeof(e.rect.x)); return; }
+    if ( property == "rect.y" ) { e.rect.y = value.to!(typeof(e.rect.y)); return; }
+    if ( property == "rect.h" ) { e.rect.h = value.to!(typeof(e.rect.h)); return; }
+
+    if ( property == "text" ) { (cast(Button)e).text = value.strip("\""); return; }
+
+    writeln( "SKIP: property: ", property );
 }
 
-void asgn_property( PROP )( GObject e, string value )
+void asgn_property( string PROP )( GObject e, string value )
 {
-    auto memb = get_member( GObject, PROP );
-    auto TYPE = typeof( memb );
-    auto tvalue = string_to_value!TYPE( value );
-    set_memb( e, memb, tvalue );
+    //pragma( msg, PROP );
+    __traits( getMember, e, PROP ) = 
+        string_to_value!( typeof( __traits( getMember, e, PROP ) ) )( value );
 }
 
 
@@ -186,17 +212,66 @@ void asgn_property( PROP )( GObject e, string value )
 //}
 
 
-auto string_to_value( TYPE:enum )( string value )
+auto string_to_value( T )( string value )
+    if ( is( T == string ) )
+{
+    return value;
+}
+
+auto string_to_value( T )( string value )
+    if ( is( T == ubyte ) )
+{
+    return ubyte.init;
+}
+
+auto string_to_value( T )( string value )
+    if ( is( T == SDL_Color ) )
+{
+    return SDL_Color.init;
+}
+
+auto string_to_value( T )( string value )
+    if ( is( T == SDL_Rect ) )
+{
+    return SDL_Rect.init;
+}
+
+auto string_to_value( T )( string value )
+    if ( is( T == int ) )
+{
+    return value.to!int;
+}
+
+auto string_to_value( T )( string value )
+    if ( is( T == bool ) )
+{
+    return ( value == "true" ) ? true : false;
+}
+
+auto string_to_value( T )( string value )
+    if ( is( T == BitFlags!STATES ) )
+{
+    return STATE_NORMAL;
+}
+
+auto string_to_value( T )( string value )
+    if ( is( T == GObject ) )
+{
+    return null;
+}
+
+auto string_to_value( T )( string value )
+    if ( is( T == enum ) )
 {
     static
-    foreach ( en; enum_members!enum )
+    foreach ( emb; EnumMembers!T )
     {
-        if ( en.to!string == value ) return en;
+        if ( T.stringof ~ "." ~ emb.stringof == value ) return emb;
     }
 
-    return TYPE.init; // default
+    return T.init; // default
 }
-*/
+
 struct ParseState
 {
     size_t indent;
@@ -207,11 +282,11 @@ struct ParseState
 }
 
 
-void dump_tree2( GObject root, int level=0 )
+void dump_tree2( GObject o, int level=0 )
 {
-    writeln( replicate( "  ", level ), root, ": ", root.duit_class );
+    writeln( replicate( "  ", level ), o, ": ", o.duit_class, ": ", o.w_mode, ": ", o.layout_mode );
 
-    foreach ( c; root.childs )
+    foreach ( c; o.childs )
         dump_tree2( c, level+1 );
 
 }

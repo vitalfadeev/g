@@ -15,5 +15,6 @@
 		"SDL_2022", 
 		"SDL_TTF", "SDL_TTF_2018", 
 		"SDL_Image", "SDL_Image_205"
-	]
+	],
+	"dflags"        : [ "-mixin=mixins.d" ],
 }

@@ -1,0 +1,40 @@
+panel.Panel
+  rect.x = 0
+  rect.y = 0
+  w_mode = WMODE.DISPLAY
+  h_mode = HMODE.FIXED
+  rect.h = 29
+  layout_mode = LAYOUT_MODE.HBOX
+  layout_mode_hbox_same_width = true
+
+  panel.LBox
+    layout_mode = LAYOUT_MODE.HBOX
+    layout_mode_hbox_same_width = true
+
+    panel.LMenuButton
+      layout_mode = LAYOUT_MODE.FIXED
+      text = "LMenu"
+
+  panel.CBox
+    layout_mode = LAYOUT_MODE.HBOX
+    layout_mode_hbox_same_width = true
+
+    panel.Clock
+      layout_mode = LAYOUT_MODE.FIXED
+
+  panel.RBox
+    layout_mode = LAYOUT_MODE.HBOX
+    childs_align = CHILDS_ALIGN.RIGHT
+    layout_mode_hbox_same_width = false
+
+    panel.RMenuButton
+      text = "Net"
+      w_mode = WMODE.FIXED
+      rect.w = 64
+      layout_mode = LAYOUT_MODE.FIXED
+
+    panel.SoundIndicator
+      text = "Snd"
+      w_mode = WMODE.FIXED
+      rect.w = 64
+      layout_mode = LAYOUT_MODE.FIXED

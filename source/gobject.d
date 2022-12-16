@@ -16,195 +16,18 @@ class GObject
     mixin TreeObject!GObject;
     mixin StateObject!GObject;
     mixin LayoutObject!GObject;
+    mixin EventObject!GObject;
+    mixin RenderObject!GObject;
 
-    SDL_Rect  rect;
-    ubyte     flags;
-    SDL_Color fg;
-    SDL_Color bg;
-
-    WMODE w_mode;
-    HMODE h_mode;
-
-    int padding_l; // left
-    int padding_t; // top
-    int padding_r; // right
-    int padding_b; // bottom
-
-    bool borders_enable = false;
-
-    CHILDS_ALIGN childs_align;
+    ubyte flags;
 
     string duit_class;
-
-
-    size_t main( SDL_Event* e )
-    {
-        if ( e.type == SDL_MOUSEBUTTONDOWN ) return _mouse_button( e );
-        if ( e.type == SDL_MOUSEBUTTONUP   ) return _mouse_button( e );
-        if ( e.type == SDL_MOUSEWHEEL      ) return _mouse_wheel( e );
-        if ( e.type == OP.RENDER           ) return render( e );
-        //if ( e.type == OP.DRAWED ) return this.drawed( e );
-        return this.each_child_main( e );
-    }
 
 
     bool hit_test( Sint32 x, Sint32 y )
     {
         SDL_Point point = SDL_Point( x, y );
         return SDL_PointInRect( &point, &rect );
-    }
-
-
-    size_t _mouse_wheel( SDL_Event* e )
-    {
-        int x;
-        int y;
-        SDL_GetMouseState( &x, &y );
-        import tools;
-
-        if ( hit_test( x, y ) ) 
-            mouse_wheel( e );
-
-        return 0;
-    }
-
-
-    size_t mouse_wheel( SDL_Event* e )
-    {
-        // State
-        change_state( e );
-
-        // Styles
-        apply_styles_recursive( this );
-
-        // Remder
-        push_render();
-
-        // Childs
-        this.each_child_main( e );
-
-        return 0;
-    }
-
-
-    size_t _mouse_button( SDL_Event* e )
-    {
-        //writeln( this, ": ", e.type );
-        //writeln( this, ":   ", e.button.x, ", ", e.button.y );
-        //writeln( this, ":   ", rect.x, ", ", rect.y, " ", rect.w, "x", rect.h );
-        if ( hit_test( e.button.x, e.button.y ) ) 
-            mouse_button( e );
-
-        return 0;
-    }
-
-
-    size_t mouse_button( SDL_Event* e )
-    {
-        // State
-        change_state( e );
-
-        // Styles
-        apply_styles_recursive( this );
-
-        // Remder
-        push_render();
-
-        // Childs
-        this.each_child_main( e );
-
-        // Context Menu
-        if ( e.button.type == SDL_MOUSEBUTTONDOWN )
-        if ( e.button.button == SDL_BUTTON_RIGHT )
-        {
-            SDL_Window* cur_window;
-            cur_window = SDL_GetWindowFromID( e.button.windowID );
-
-            int wx;
-            int wy;
-            SDL_GetWindowPosition( cur_window, &wx, &wy );
-
-            SDL_Point at_point;
-            at_point.x = e.button.x + wx;
-            at_point.y = e.button.y + wy;
-
-            return show_context_menu( e, cur_window, &at_point );
-        }
-
-        return 0;
-    }
-
-
-    size_t render( SDL_Event* e )
-    {
-        return 0;
-    }
-
-
-    void render( SDL_Renderer* renderer )
-    {
-        // bg, borders
-        render_bg( renderer );
-        render_borders( renderer );
-
-        // Render childs
-        render_childs( renderer );
-    }
-
-
-    void render_bg( SDL_Renderer* renderer )
-    {
-        // fill rect x, y, w, h
-        SDL_SetRenderDrawColor( renderer, bg.r, bg.g, bg.b, bg.a  );
-        SDL_RenderFillRect( renderer, &rect );
-    }
-
-
-    void render_borders( SDL_Renderer* renderer )
-    {
-        // borders rect x, y, w, h
-        if ( borders_enable )
-        {        
-            SDL_SetRenderDrawColor( renderer, fg.r, fg.g, fg.b, fg.a  );
-            SDL_RenderDrawRect( renderer, &rect );
-        }
-    }
-
-
-    void render_childs( SDL_Renderer* renderer )
-    {
-        foreach ( c; childs )
-            c.render( renderer );
-    }
-
-
-    void push_render()
-    {
-        // Create new SDL render event
-        // Push in SDL Event Loop
-        SDL_Event e;
-        e.type          = cast( SDL_EventType )OP.RENDER;
-        e.user.code     = OP.RENDER;
-        e.user.data1    = cast( void* )this; // FIXME
-        e.user.data2    = null;
-        auto res = SDL_PushEvent( &e );
-        //  1 - success
-        //  0 - filtered
-        // <0 - error
-        if ( res == 0 )
-            throw new SDLException( "SDL_PushEvent(): filtered" );
-        else if ( res < 0 )
-            throw new SDLException( "SDL_PushEvent(): error" );
-    }
-
-
-    //
-    void content_rect( SDL_Rect* crect )
-    {
-        crect.x = rect.x + padding_l;
-        crect.y = rect.y + padding_t;
-        crect.w = rect.w - padding_l - padding_r;
-        crect.h = rect.h - padding_t - padding_b;
     }
 
 
@@ -311,11 +134,17 @@ void layout_LEFT( GObject o )
 
 mixin template LayoutObject( T )
 {
+    WMODE w_mode;
+    HMODE h_mode;
+
     LAYOUT_MODE layout_mode;
     bool  layout_mode_hbox_same_width = true;
     bool  layout_mode_hbox_fixed_width = false;
     int   layout_mode_hbox_child_width = 0; // px
     //WMODE layout_mode_hbox_child_w_mode = WMODE.FIXED;
+
+    CHILDS_ALIGN childs_align;
+
 
     void layout()
     {
@@ -382,5 +211,192 @@ mixin template StateObject( T )
         else
         if ( e.type == SDL_MOUSEBUTTONUP )
             state &= ~STATE_PRESSED;        
+    }
+}
+
+
+mixin template EventObject( T )
+{
+    GObject bindo;
+
+
+    size_t main( SDL_Event* e )
+    {
+        if ( bindo !is null ) bindo.main( e );
+
+        if ( e.type == SDL_MOUSEBUTTONDOWN ) return _mouse_button( e );
+        if ( e.type == SDL_MOUSEBUTTONUP   ) return _mouse_button( e );
+        if ( e.type == SDL_MOUSEWHEEL      ) return _mouse_wheel( e );
+        if ( e.type == OP.RENDER           ) return render( e );
+        //if ( e.type == OP.DRAWED ) return this.drawed( e );
+        return this.each_child_main( e );
+    }
+
+
+    size_t _mouse_wheel( SDL_Event* e )
+    {
+        int x;
+        int y;
+        SDL_GetMouseState( &x, &y );
+        import tools;
+
+        if ( hit_test( x, y ) ) 
+            mouse_wheel( e );
+
+        return 0;
+    }
+
+
+    size_t mouse_wheel( SDL_Event* e )
+    {
+        // State
+        change_state( e );
+
+        // Styles
+        apply_styles_recursive( this );
+
+        // Remder
+        push_render();
+
+        // Childs
+        this.each_child_main( e );
+
+        return 0;
+    }
+
+
+    size_t _mouse_button( SDL_Event* e )
+    {
+        //writeln( this, ": ", e.type );
+        //writeln( this, ":   ", e.button.x, ", ", e.button.y );
+        //writeln( this, ":   ", rect.x, ", ", rect.y, " ", rect.w, "x", rect.h );
+        if ( hit_test( e.button.x, e.button.y ) ) 
+            mouse_button( e );
+
+        return 0;
+    }
+
+
+    size_t mouse_button( SDL_Event* e )
+    {
+        // State
+        change_state( e );
+
+        // Styles
+        apply_styles_recursive( this );
+
+        // Remder
+        push_render();
+
+        // Childs
+        this.each_child_main( e );
+
+        // Context Menu
+        if ( e.button.type == SDL_MOUSEBUTTONDOWN )
+        if ( e.button.button == SDL_BUTTON_RIGHT )
+        {
+            SDL_Window* cur_window;
+            cur_window = SDL_GetWindowFromID( e.button.windowID );
+
+            int wx;
+            int wy;
+            SDL_GetWindowPosition( cur_window, &wx, &wy );
+
+            SDL_Point at_point;
+            at_point.x = e.button.x + wx;
+            at_point.y = e.button.y + wy;
+
+            return show_context_menu( e, cur_window, &at_point );
+        }
+
+        return 0;
+    }
+
+
+    size_t render( SDL_Event* e )
+    {
+        return 0;
+    }
+
+
+    void push_render()
+    {
+        // Create new SDL render event
+        // Push in SDL Event Loop
+        SDL_Event e;
+        e.type          = cast( SDL_EventType )OP.RENDER;
+        e.user.code     = OP.RENDER;
+        e.user.data1    = cast( void* )this; // FIXME
+        e.user.data2    = null;
+        auto res = SDL_PushEvent( &e );
+        //  1 - success
+        //  0 - filtered
+        // <0 - error
+        if ( res == 0 )
+            throw new SDLException( "SDL_PushEvent(): filtered" );
+        else if ( res < 0 )
+            throw new SDLException( "SDL_PushEvent(): error" );
+    }
+}
+
+
+mixin template RenderObject( T )
+{
+    SDL_Rect  rect;
+    SDL_Color fg;
+    SDL_Color bg;
+
+    int padding_l; // left
+    int padding_t; // top
+    int padding_r; // right
+    int padding_b; // bottom
+
+    bool borders_enable = false;
+
+
+    void render( SDL_Renderer* renderer )
+    {
+        // bg, borders
+        render_bg( renderer );
+        render_borders( renderer );
+
+        // Render childs
+        render_childs( renderer );
+    }
+
+
+    void render_bg( SDL_Renderer* renderer )
+    {
+        // fill rect x, y, w, h
+        SDL_SetRenderDrawColor( renderer, bg.r, bg.g, bg.b, bg.a  );
+        SDL_RenderFillRect( renderer, &rect );
+    }
+
+
+    void render_borders( SDL_Renderer* renderer )
+    {
+        // borders rect x, y, w, h
+        if ( borders_enable )
+        {        
+            SDL_SetRenderDrawColor( renderer, fg.r, fg.g, fg.b, fg.a  );
+            SDL_RenderDrawRect( renderer, &rect );
+        }
+    }
+
+
+    void render_childs( SDL_Renderer* renderer )
+    {
+        foreach ( c; childs )
+            c.render( renderer );
+    }
+
+
+    //
+    void content_rect( SDL_Rect* crect )
+    {
+        crect.x = rect.x + padding_l;
+        crect.y = rect.y + padding_t;
+        crect.w = rect.w - padding_l - padding_r;
+        crect.h = rect.h - padding_t - padding_b;
     }
 }

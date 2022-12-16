@@ -15,11 +15,11 @@ import bindbc.sdl.ttf;
 import sdlexception;
 
 
-//void main()
-//{
-//    import duit;
-//    test1();
-//}
+void main2()
+{
+    import duit;
+    test2();
+}
 
 int main()
 {
@@ -34,7 +34,7 @@ int main()
 
     // 1.
     // Panel
-    Panel panel;
+    GObject panel;
     create_tree( root, panel );
 
     // Window
@@ -53,7 +53,7 @@ int main()
 
     // 2.
     // Panel 2
-    BottomPanel panel2;
+    GObject panel2;
     create_tree2( root, panel2 );
 
     // Window 2
@@ -131,8 +131,12 @@ void init_sdl()
 
 
 //
-void create_tree( ref Root root, ref Panel panel )
+void create_tree( ref Root root, ref GObject panel )
 {
+    import duit;
+    panel = read_file( "panel1.duit" );
+    root.add_child( panel );
+
     // +----------------------------------------------+ Panel
     // | +------------+ +------------+ +------------+ | RBox, CBox, LBox
     // | | +--------+ | | +--------+ | | +---++---+ | | LButton, Clock, RButton
@@ -141,87 +145,91 @@ void create_tree( ref Root root, ref Panel panel )
     // | +------------+ +------------+ +------------+ |
     // +----------------------------------------------+
 
-    // 1.
-    // Panel
-    panel = new Panel;
-    root.add_child( panel );
-    panel.rect.x = 0;
-    panel.rect.y = 0;
-    panel.w_mode = WMODE.DISPLAY;
-    panel.h_mode = HMODE.FIXED;
-    panel.rect.h = 29;
-    panel.layout_mode = LAYOUT_MODE.HBOX;
-    panel.layout_mode_hbox_same_width = true;
+    //// 1.
+    //// Panel
+    //panel = new Panel;
+    //root.add_child( panel );
+    //panel.rect.x = 0;
+    //panel.rect.y = 0;
+    //panel.w_mode = WMODE.DISPLAY;
+    //panel.h_mode = HMODE.FIXED;
+    //panel.rect.h = 29;
+    //panel.layout_mode = LAYOUT_MODE.HBOX;
+    //panel.layout_mode_hbox_same_width = true;
 
-    // Boxes    
-    auto lbox = new LBox;
-    auto cbox = new CBox;
-    auto rbox = new RBox;
-    panel.add_child( lbox );
-    panel.add_child( cbox );
-    panel.add_child( rbox );
-    lbox.layout_mode = LAYOUT_MODE.HBOX;
-    cbox.layout_mode = LAYOUT_MODE.HBOX;
-    rbox.layout_mode = LAYOUT_MODE.HBOX;
-    rbox.childs_align = CHILDS_ALIGN.RIGHT;
-    lbox.layout_mode_hbox_same_width = true;
-    cbox.layout_mode_hbox_same_width = true;
-    rbox.layout_mode_hbox_same_width = false;
+    //// Boxes    
+    //auto lbox = new LBox;
+    //auto cbox = new CBox;
+    //auto rbox = new RBox;
+    //panel.add_child( lbox );
+    //panel.add_child( cbox );
+    //panel.add_child( rbox );
+    //lbox.layout_mode = LAYOUT_MODE.HBOX;
+    //cbox.layout_mode = LAYOUT_MODE.HBOX;
+    //rbox.layout_mode = LAYOUT_MODE.HBOX;
+    //rbox.childs_align = CHILDS_ALIGN.RIGHT;
+    //lbox.layout_mode_hbox_same_width = true;
+    //cbox.layout_mode_hbox_same_width = true;
+    //rbox.layout_mode_hbox_same_width = false;
 
-    // L Buttons
-    auto lb1 = new LMenuButton;
-    lbox.add_child( lb1 );
-    lb1.layout_mode = LAYOUT_MODE.FIXED;
-    lb1.text = "LMenu";
+    //// L Buttons
+    //auto lb1 = new LMenuButton;
+    //lbox.add_child( lb1 );
+    //lb1.layout_mode = LAYOUT_MODE.FIXED;
+    //lb1.text = "LMenu";
 
-    // Clock
-    auto clk = new Clock;
-    cbox.add_child( clk );
-    clk.layout_mode = LAYOUT_MODE.FIXED;
+    //// Clock
+    //auto clk = new Clock;
+    //cbox.add_child( clk );
+    //clk.layout_mode = LAYOUT_MODE.FIXED;
 
-    // R Buttons
-    auto rb1 = new RMenuButton;
-    rbox.add_child( rb1 );
-    rb1.text = "Net";
-    rb1.w_mode = WMODE.FIXED;
-    rb1.rect.w = 64;
-    rb1.layout_mode = LAYOUT_MODE.FIXED;
+    //// R Buttons
+    //auto rb1 = new RMenuButton;
+    //rbox.add_child( rb1 );
+    //rb1.text = "Net";
+    //rb1.w_mode = WMODE.FIXED;
+    //rb1.rect.w = 64;
+    //rb1.layout_mode = LAYOUT_MODE.FIXED;
 
-    auto rb2 = new SoundIndicator;
-    rbox.add_child( rb2 );
-    rb2.text = "Snd";
-    rb2.w_mode = WMODE.FIXED;
-    rb2.rect.w = 64;
-    rb2.layout_mode = LAYOUT_MODE.FIXED;
+    //auto rb2 = new SoundIndicator;
+    //rbox.add_child( rb2 );
+    //rb2.text = "Snd";
+    //rb2.w_mode = WMODE.FIXED;
+    //rb2.rect.w = 64;
+    //rb2.layout_mode = LAYOUT_MODE.FIXED;
 }
 
 
-void create_tree2( ref Root root, ref BottomPanel panel2 )
+void create_tree2( ref Root root, ref GObject panel2 )
 {
-    // 2.
-    // Bottom Panel
-    panel2 = new BottomPanel;
+    import duit;
+    panel2 = read_file( "panel2.duit" );
     root.add_child( panel2 );
-    panel2.rect.x = 0;
-    panel2.rect.y = 0; // 768 - 96 - 100;
-    panel2.w_mode = WMODE.DISPLAY;
-    panel2.h_mode = HMODE.FIXED;
-    panel2.rect.h = 96;
-    panel2.layout_mode  = LAYOUT_MODE.HBOX;
-    //panel2.layout_mode  = LAYOUT_MODE.FIXED;
-    panel2.childs_align = CHILDS_ALIGN.CENTER;
 
-    auto ab1 = new AppButton;
-    panel2.add_child( ab1 );
-    ab1.text = "App";
-    ab1.rect.x = ( 1366-96 )/2;
-    ab1.rect.y = 0;
-    ab1.w_mode = WMODE.FIXED;
-    ab1.rect.w = 96;
-    ab1.h_mode = HMODE.FIXED;
-    ab1.rect.h = 96;
-    ab1.layout_mode = LAYOUT_MODE.FIXED;
-    ab1.borders_enable = true;
+    //// 2.
+    //// Bottom Panel
+    //panel2 = new BottomPanel;
+    //root.add_child( panel2 );
+    //panel2.rect.x = 0;
+    //panel2.rect.y = 0; // 768 - 96 - 100;
+    //panel2.w_mode = WMODE.DISPLAY;
+    //panel2.h_mode = HMODE.FIXED;
+    //panel2.rect.h = 96;
+    //panel2.layout_mode  = LAYOUT_MODE.HBOX;
+    ////panel2.layout_mode  = LAYOUT_MODE.FIXED;
+    //panel2.childs_align = CHILDS_ALIGN.CENTER;
+
+    //auto ab1 = new AppButton;
+    //panel2.add_child( ab1 );
+    //ab1.text = "App";
+    //ab1.rect.x = ( 1366-96 )/2;
+    //ab1.rect.y = 0;
+    //ab1.w_mode = WMODE.FIXED;
+    //ab1.rect.w = 96;
+    //ab1.h_mode = HMODE.FIXED;
+    //ab1.rect.h = 96;
+    //ab1.layout_mode = LAYOUT_MODE.FIXED;
+    //ab1.borders_enable = true;
 }
 
 

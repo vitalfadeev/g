@@ -1,0 +1,19 @@
+bottom_panel.BottomPanel
+  rect.x = 0
+  rect.y = 0
+  w_mode = WMODE.DISPLAY
+  h_mode = HMODE.FIXED
+  rect.h = 96
+  layout_mode  = LAYOUT_MODE.HBOX
+  childs_align = CHILDS_ALIGN.CENTER
+
+  bottom_panel.AppButton
+    text   = "App"
+    rect.x = 635
+    rect.y = 0
+    w_mode = WMODE.FIXED
+    rect.w = 96
+    h_mode = HMODE.FIXED
+    rect.h = 96
+    layout_mode    = LAYOUT_MODE.FIXED
+    borders_enable = true
