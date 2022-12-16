@@ -14,6 +14,7 @@ import button;
 import text;
 import tools;
 import style;
+import sysmixer;
 import sdlexception;
 
 
@@ -164,17 +165,17 @@ uint _timer_callback( uint interval, void* param )
 
 class LBox : GObject
 {
-    //
-}
-
-class RBox : GObject
-{
-    //
+    // childs align left
 }
 
 class CBox : GObject
 {
-    //
+    // childs align center
+}
+
+class RBox : GObject
+{
+    // childs align right
 }
 
 class LMenuButton : Button
@@ -206,28 +207,10 @@ class RMenuButton : Button
 }
 
 
-import sound : Sound;
-import was   : CAudioEndpointVolumeCallback, VolumeMonitor, IAudioEndpointVolumeCallback;
-// RegisterSystemNotificationCallback();
-// CAudioEndpointVolumeCallback callback;
-// VolumeMonitor                monitor;
-//
-//void RegisterSystemNotificationCallback()
-//{
-//    auto callback = new CAudioEndpointVolumeCallback( &onMasterVolumeChanged );
-//    auto monitor = new VolumeMonitor( callback );
-//}
-//
-//extern ( D )
-//void onMasterVolumeChanged( float level )
-//{
-//    UpdateSoundIcon( false, level );
-//    RePaint();
-//}
-
 class SoundIndicator : RMenuButton
 {
     string icon;
+    float  level;
 
     // icon
     // mouse scroll up   - volume up
@@ -268,30 +251,38 @@ class SoundIndicator : RMenuButton
 
     void try_volume_up()
     {
-        //if ( Sound.MasterVolumePageUp() )
-        //  render()
         sys_mixer.try_volume_up();
 
-        update_icon();
+        update_level();
+        update_text();
+        //update_icon();
     }
 
 
     void try_volume_down()
     {
-        //if ( Sound.MasterVolumePageDown() )
-        //  render()
         sys_mixer.try_volume_down();
 
-        update_icon();
+        update_level();
+        update_text();
+        //update_icon();
+    }
+
+
+    void update_level()
+    {
+        level = _get_current_volume();
+    }
+
+
+    void update_text()
+    {
+        text = ( level * 100 ).to!string;        
     }
 
 
     void update_icon()
     {
-        float level = get_current_volume();
-
-        text = ( level * 100 ).to!string;
-
         if ( level == 0 )
             icon = "disabled";
         else if ( level == 0 )
@@ -307,7 +298,7 @@ class SoundIndicator : RMenuButton
     }
 
 
-    float get_current_volume()
+    float _get_current_volume()
     {
         return sys_mixer.get_current_volume();
     }
@@ -366,26 +357,3 @@ class SoundIndicator : RMenuButton
         SDL_DestroyTexture( img_texture );
     }
 }
-
-
-struct SysMixer
-{
-    void try_volume_up()
-    {
-        Sound.master_volume_page_up();
-    }
-
-
-    void try_volume_down()
-    {
-        Sound.master_volume_page_down();
-    }
-
-
-    float get_current_volume()
-    {
-        return Sound.get_master_volume();
-    }
-}
-
-SysMixer sys_mixer;

@@ -36,6 +36,8 @@ class GObject : TreeObject
 
     bool borders_enable;
 
+    CHILDS_ALIGN childs_align;
+
 
     override
     size_t main( SDL_Event* e )
@@ -335,7 +337,17 @@ enum LAYOUT_MODE
 }
 
 
+enum CHILDS_ALIGN
+{
+    LEFT,
+    CENTER,
+    RIGHT,
+}
+
+
 void layout_LEFT( GObject o )
 {
     //
 }
+
+

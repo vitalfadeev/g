@@ -132,16 +132,10 @@ void create_tree( ref Tree tree )
     lbox.layout_mode = LAYOUT_MODE.HBOX;
     cbox.layout_mode = LAYOUT_MODE.HBOX;
     rbox.layout_mode = LAYOUT_MODE.HBOX;
-    lbox.w_mode = WMODE.FIXED;
-    cbox.w_mode = WMODE.FIXED;
-    rbox.w_mode = WMODE.FIXED;
-    //lbox.rect.w = 1366/3;
-    //cbox.rect.w = 1366/3;
-    //rbox.rect.w = 1366/3;
-    //lbox.layout_mode_hbox_same_width = true;
+    rbox.childs_align = CHILDS_ALIGN.RIGHT;
     lbox.layout_mode_hbox_same_width = true;
     cbox.layout_mode_hbox_same_width = true;
-    rbox.layout_mode_hbox_same_width = true;
+    rbox.layout_mode_hbox_same_width = false;
 
     // L Buttons
     auto lb1 = new LMenuButton;
@@ -157,13 +151,15 @@ void create_tree( ref Tree tree )
     // R Buttons
     auto rb1 = new RMenuButton;
     rbox.add_child( rb1 );
-    rb1.text = "R1";
+    rb1.text = "Net";
+    rb1.w_mode = WMODE.FIXED;
     rb1.rect.w = 64;
     rb1.layout_mode = LAYOUT_MODE.FIXED;
 
     auto rb2 = new SoundIndicator;
     rbox.add_child( rb2 );
-    rb2.text = "R2";
+    rb2.text = "Snd";
+    rb2.w_mode = WMODE.FIXED;
     rb2.rect.w = 64;
     rb2.layout_mode = LAYOUT_MODE.FIXED;
 
@@ -220,6 +216,9 @@ void create_window( ref SDL_Window* window )
 
     if ( !window )
         throw new SDLException( "Failed to create window" );
+
+    // Always On Top
+    SDL_SetWindowAlwaysOnTop( window, SDL_TRUE );
 
     // Update
     SDL_UpdateWindowSurface( window );

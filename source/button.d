@@ -62,19 +62,6 @@ class Button : GObject
         render_borders( renderer );
         render_text( renderer );
 
-        // Text
-        SDL_SetRenderDrawColor( renderer, 198, 198, 198, 255  );
-        int text_w =  2;
-        int text_h = 16;
-        SDL_Rect r = 
-            SDL_Rect( 
-                rect.x + rect.w / 2 - text_w / 2, 
-                rect.y + rect.h / 2 - text_h / 2, 
-                text_w, 
-                text_h 
-            );
-        SDL_RenderFillRect( renderer, &r );
-
         // Render childs
         render_childs( renderer );
     }

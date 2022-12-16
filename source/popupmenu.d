@@ -110,6 +110,9 @@ void create_window( ref SDL_Window* window, SDL_Point* at_point )
     if ( !window )
         throw new SDLException( "Failed to create window" );
 
+    // Always On Top
+    SDL_SetWindowAlwaysOnTop( window, SDL_TRUE );
+
     // Update
     SDL_UpdateWindowSurface( window );    
 }
