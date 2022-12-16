@@ -30,7 +30,7 @@ class Root : GObject
     void push_render()
     {
         foreach ( c; childs )
-            ( cast( GObject )c ).push_render();
+            c.push_render();
     }
 }
 

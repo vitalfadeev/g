@@ -1,0 +1,35 @@
+panel
+  w_mode       = WMODE.DISPLAY
+  h_mode       = HMODE.FIXED
+  layout_mode  = LAYOUT_MODE.HBOX
+  childs_align = CHILDS_ALIGN.CENTER
+
+  favorites
+    app_btn
+      icon = ""
+      exec = ""
+      text = "explorer"
+    app_btn
+      icon = ""
+      exec = ""
+      text = "edge"
+    app_btn
+      icon = ""
+      exec = ""
+      text = "aimp"
+    app_btn
+      icon = ""
+      exec = ""
+      text = "far"
+    app_btn
+      icon = ""
+      exec = ""
+      text = "sublime-text"
+    app_btn
+      icon = ""
+      exec = ""
+      text = "sublime-merge"
+    app_btn
+      icon = ""
+      exec = ""
+      text = "calc"

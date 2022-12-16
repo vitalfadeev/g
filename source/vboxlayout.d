@@ -18,8 +18,8 @@ class VBoxLayout : Layout
 
         foreach ( c; childs )
         {
-            ( cast( GObject )c ).rect.y = y;
-            y += ( cast( GObject )c ).rect.h;
+            c.rect.y = y;
+            y += c.rect.h;
         }
     }
 }

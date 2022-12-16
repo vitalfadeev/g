@@ -16,7 +16,7 @@ Style[] styles;
 class Style
 {
     string class_name;
-    BitFlags!States state;
+    BitFlags!STATES state;
 
     void apply( GObject o ) {}
 }
@@ -32,8 +32,8 @@ class Style1 : Style
     override
     void apply( GObject o )
     {
-        ( cast( GObject )o ).bg = SDL_Color(    0,  0,     0, SDL_ALPHA_OPAQUE );
-        ( cast( GObject )o ).fg = SDL_Color(  200,  200, 200, SDL_ALPHA_OPAQUE );
+        o.bg = SDL_Color(    0,  0,     0, SDL_ALPHA_OPAQUE );
+        o.fg = SDL_Color(  200,  200, 200, SDL_ALPHA_OPAQUE );
     }
 }
 
@@ -48,8 +48,8 @@ class Style2 : Style
     override
     void apply( GObject o )
     {
-        ( cast( GObject )o ).bg = SDL_Color(    0,  0,     0, SDL_ALPHA_OPAQUE );
-        ( cast( GObject )o ).fg = SDL_Color(  200,  200, 200, SDL_ALPHA_OPAQUE );
+        o.bg = SDL_Color(    0,  0,     0, SDL_ALPHA_OPAQUE );
+        o.fg = SDL_Color(  200,  200, 200, SDL_ALPHA_OPAQUE );
     }
 }
 
@@ -83,10 +83,10 @@ class Style4 : Style
         import panel;
         ( cast( Clock   )o ).font_file = "InputSansCondensed-Regular.ttf";
         ( cast( Clock   )o ).font_size = 17;
-        ( cast( GObject )o ).padding_t = 1;
-        ( cast( GObject )o ).padding_b = 1;
-        ( cast( GObject )o ).bg = SDL_Color(    0,  0,     0, SDL_ALPHA_OPAQUE );
-        ( cast( GObject )o ).fg = SDL_Color(  200,  200, 200, SDL_ALPHA_OPAQUE );
+        o.padding_t = 1;
+        o.padding_b = 1;
+        o.bg = SDL_Color(    0,  0,     0, SDL_ALPHA_OPAQUE );
+        o.fg = SDL_Color(  200,  200, 200, SDL_ALPHA_OPAQUE );
     }
 }
 
@@ -101,7 +101,7 @@ class Style5 : Style
     void apply( GObject o )
     {
         import panel;
-        ( cast( GObject )o ).padding_t = 0;
+        o.padding_t = 0;
     }
 }
 
@@ -116,7 +116,7 @@ class Style6 : Style
     void apply( GObject o )
     {
         import panel;
-        ( cast( GObject )o ).padding_t = 0;
+        o.padding_t = 0;
     }
 }
 
@@ -131,7 +131,7 @@ class Style7 : Style
     void apply( GObject o )
     {
         import panel;
-        ( cast( GObject )o ).padding_t = 0;
+        o.padding_t = 0;
     }
 }
 
@@ -145,7 +145,7 @@ class Style8 : Style
     override
     void apply( GObject o )
     {
-        ( cast( GObject )o ).bg = SDL_Color( 0, 0, 0, SDL_ALPHA_OPAQUE );
+        o.bg = SDL_Color( 0, 0, 0, SDL_ALPHA_OPAQUE );
     }
 }
 
@@ -171,7 +171,7 @@ void apply_styles_recursive( GObject cur )
     apply_styles( cur );
 
     foreach ( c; cur.childs )
-        ( cast( GObject )c ).apply_styles_recursive();
+        c.apply_styles_recursive();
 }
 
 //

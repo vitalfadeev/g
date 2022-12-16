@@ -48,10 +48,10 @@ void _same_width( GObject o )
 
     foreach ( c; o.childs )
     {
-        ( cast( GObject )c ).rect.x = x;
-        ( cast( GObject )c ).rect.y = y;
-        ( cast( GObject )c ).rect.h = h;
-        ( cast( GObject )c ).rect.w = w;
+        c.rect.x = x;
+        c.rect.y = y;
+        c.rect.h = h;
+        c.rect.w = w;
 
         x += w;
     }
@@ -78,13 +78,13 @@ void _childs_align_left( GObject o )
             ( crect.w );
     foreach ( c; o.childs )
     {
-        ( cast( GObject )c ).rect.x = x;
-        ( cast( GObject )c ).rect.y = y;
-        ( cast( GObject )c ).rect.h = h;
-        x += ( cast( GObject )c ).rect.w;
+        c.rect.x = x;
+        c.rect.y = y;
+        c.rect.h = h;
+        x += c.rect.w;
 
         if ( o.layout_mode_hbox_same_width )
-            ( cast( GObject )c ).rect.w = w;
+            c.rect.w = w;
     }
 }
 
@@ -109,13 +109,13 @@ void _childs_align_center( GObject o )
             ( crect.w );
     foreach ( c; o.childs )
     {
-        ( cast( GObject )c ).rect.x = x;
-        ( cast( GObject )c ).rect.y = y;
-        ( cast( GObject )c ).rect.h = h;
-        x += ( cast( GObject )c ).rect.w;
+        c.rect.x = x;
+        c.rect.y = y;
+        c.rect.h = h;
+        x += c.rect.w;
 
         if ( o.layout_mode_hbox_same_width )
-            ( cast( GObject )c ).rect.w = w;
+            c.rect.w = w;
     }
 }
 
@@ -132,10 +132,10 @@ void _childs_align_right( GObject o )
     {
         childs_count++;
 
-        if ( ( cast( GObject )c ).w_mode == WMODE.FIXED )
-            childs_w += ( cast( GObject )c ).rect.w;
+        if ( c.w_mode == WMODE.FIXED )
+            childs_w += c.rect.w;
         else
-            childs_w += ( cast( GObject )c ).rect.w;
+            childs_w += c.rect.w;
     }
 
     // Layout
@@ -145,10 +145,10 @@ void _childs_align_right( GObject o )
     int w = crect.w;
     foreach ( c; o.childs )
     {
-        ( cast( GObject )c ).rect.x = x;
-        ( cast( GObject )c ).rect.y = y;
-        ( cast( GObject )c ).rect.h = h;
+        c.rect.x = x;
+        c.rect.y = y;
+        c.rect.h = h;
 
-        x += ( cast( GObject )c ).rect.w;
+        x += c.rect.w;
     }
 }

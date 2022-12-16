@@ -1,44 +1,31 @@
 module treeobject;
 
 import std.stdio;
-import std.typecons;
 import bindbc.sdl;
-import op;
-import style;
-import states;
-import gobject;
 
 
-class TreeObject : Object
+mixin template TreeObject( T )
 {
-    TreeObject parent;
-    TreeObject l;
-    TreeObject r;
-    TreeObject l_child;
-    TreeObject r_child;
+    T parent;
+    T l;
+    T r;
+    T l_child;
+    T r_child;
 
 
-    size_t main( SDL_Event* e )
-    {
-        //if ( e.type == OP.CREATE   ) return this.create( e );
-        //if ( e.type == OP.CREATEED ) return this.created( e );
-        return 0;
-    }
-
-
-    void add( TreeObject b )
+    void add( T b )
     {
         add_r( b );
     }
 
 
-    void add_child( TreeObject b )
+    void add_child( T b )
     {
         add_r_child( b );
     }
 
 
-    void add_r( TreeObject b )
+    void add_r( T b )
     {
         r = b;
         b.l = this;
@@ -54,7 +41,7 @@ class TreeObject : Object
     }
 
 
-    void add_l( TreeObject b )
+    void add_l( T b )
     {
         l = b;
         b.r = this;
@@ -70,7 +57,7 @@ class TreeObject : Object
     }
 
 
-    void add_r_child( TreeObject c )
+    void add_r_child( T c )
     {
         if ( r_child !is null )
             r_child.r = c;
@@ -85,7 +72,7 @@ class TreeObject : Object
     }
 
 
-    void add_l_child( TreeObject c )
+    void add_l_child( T c )
     {
         if ( l_child !is null )
             l_child = c;
@@ -100,7 +87,7 @@ class TreeObject : Object
     }
 
 
-    void sub( TreeObject c )
+    void sub( T c )
     {
         auto l = c.l;
         auto r = c.r;
@@ -140,9 +127,9 @@ class TreeObject : Object
 
     struct ChildsForwardIterator
     {
-        TreeObject front;
+        T front;
 
-        this( TreeObject parent )
+        this( T parent )
         {
             this.front  = parent.l_child;
         }
@@ -167,10 +154,10 @@ class TreeObject : Object
 
     struct AllChildsForwardIterator
     {
-        TreeObject   front;
-        TreeObject[] parents;
+        T   front;
+        T[] parents;
 
-        this( TreeObject root )
+        this( T root )
         {
             this.front  = root;
         }
@@ -211,24 +198,4 @@ class TreeObject : Object
             }
         }
     }
-}
-
-
-//
-void each_child( FUNC )( TreeObject root, FUNC callback )
-{
-    foreach ( c; root.childs )
-        callback( c );
-}
-
-
-//
-size_t each_child_main( TreeObject root, SDL_Event* e )
-{
-    size_t res;
-
-    foreach ( c; root.childs )
-        res = c.main( e );
-
-    return res;
 }

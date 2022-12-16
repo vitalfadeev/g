@@ -15,6 +15,12 @@ import bindbc.sdl.ttf;
 import sdlexception;
 
 
+//void main()
+//{
+//    import duit;
+//    test1();
+//}
+
 int main()
 {
     // Init

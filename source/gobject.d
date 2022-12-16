@@ -11,8 +11,12 @@ import sdlexception;
 import layout_mode_hbox;
 
 
-class GObject : TreeObject
+class GObject
 {
+    mixin TreeObject!GObject;
+    mixin StateObject!GObject;
+    mixin LayoutObject!GObject;
+
     SDL_Rect  rect;
     ubyte     flags;
     SDL_Color fg;
@@ -26,20 +30,13 @@ class GObject : TreeObject
     int padding_r; // right
     int padding_b; // bottom
 
-    BitFlags!States state;
-
-    LAYOUT_MODE layout_mode;
-    bool  layout_mode_hbox_same_width = true;
-    bool  layout_mode_hbox_fixed_width = false;
-    int   layout_mode_hbox_child_width = 0; // px
-    //WMODE layout_mode_hbox_child_w_mode = WMODE.FIXED;
-
     bool borders_enable = false;
 
     CHILDS_ALIGN childs_align;
 
+    string duit_class;
 
-    override
+
     size_t main( SDL_Event* e )
     {
         if ( e.type == SDL_MOUSEBUTTONDOWN ) return _mouse_button( e );
@@ -138,54 +135,6 @@ class GObject : TreeObject
     }
 
 
-    void change_state( SDL_Event* e )
-    {
-        if ( e.type == SDL_MOUSEBUTTONDOWN )
-            state |= STATE_PRESSED;
-        else
-        if ( e.type == SDL_MOUSEBUTTONUP )
-            state &= ~STATE_PRESSED;        
-    }
-
-
-    void layout()
-    {
-        // Layout This
-        if ( w_mode == WMODE.DISPLAY )
-        {        
-            SDL_DisplayMode display_mode;
-            SDL_GetCurrentDisplayMode( 0, &display_mode );
-            rect.w = display_mode.w;
-        }
-
-        //
-        else
-        if ( w_mode == WMODE.FIXED )
-        {
-            //
-        }
-
-
-        if ( h_mode == HMODE.DISPLAY )
-        {        
-            SDL_DisplayMode display_mode;
-            SDL_GetCurrentDisplayMode( 0, &display_mode );
-            rect.h = display_mode.h;
-        }
-
-        //
-        switch ( layout_mode )
-        {
-            case LAYOUT_MODE.HBOX: layout_mode_hbox.apply( this ); break;
-            default:
-        }
-
-        // Layout Childs
-        foreach( c; childs )
-            ( cast( GObject )c ).layout();
-    }
-
-
     size_t render( SDL_Event* e )
     {
         return 0;
@@ -225,7 +174,7 @@ class GObject : TreeObject
     void render_childs( SDL_Renderer* renderer )
     {
         foreach ( c; childs )
-            (cast( GObject )c).render( renderer );
+            c.render( renderer );
     }
 
 
@@ -256,20 +205,6 @@ class GObject : TreeObject
         crect.y = rect.y + padding_t;
         crect.w = rect.w - padding_l - padding_r;
         crect.h = rect.h - padding_t - padding_b;
-    }
-
-
-    //
-    void center_1_child()
-    {
-        //
-    }
-
-
-    //
-    void center_all_childs()
-    {
-        //
     }
 
 
@@ -308,6 +243,26 @@ void center_rect_in_rect( SDL_Rect* inner_rect, SDL_Rect* outer_rect )
 
     center_x( inner_rect, outer_rect );
     center_y( inner_rect, outer_rect );
+}
+
+
+//
+void each_child( FUNC )( GObject root, FUNC callback )
+{
+    foreach ( c; root.childs )
+        callback( c );
+}
+
+
+//
+size_t each_child_main( GObject root, SDL_Event* e )
+{
+    size_t res;
+
+    foreach ( c; root.childs )
+        res = c.main( e );
+
+    return res;
 }
 
 
@@ -354,3 +309,78 @@ void layout_LEFT( GObject o )
 }
 
 
+mixin template LayoutObject( T )
+{
+    LAYOUT_MODE layout_mode;
+    bool  layout_mode_hbox_same_width = true;
+    bool  layout_mode_hbox_fixed_width = false;
+    int   layout_mode_hbox_child_width = 0; // px
+    //WMODE layout_mode_hbox_child_w_mode = WMODE.FIXED;
+
+    void layout()
+    {
+        // Layout This
+        if ( w_mode == WMODE.DISPLAY )
+        {        
+            SDL_DisplayMode display_mode;
+            SDL_GetCurrentDisplayMode( 0, &display_mode );
+            rect.w = display_mode.w;
+        }
+
+        //
+        else
+        if ( w_mode == WMODE.FIXED )
+        {
+            //
+        }
+
+
+        if ( h_mode == HMODE.DISPLAY )
+        {        
+            SDL_DisplayMode display_mode;
+            SDL_GetCurrentDisplayMode( 0, &display_mode );
+            rect.h = display_mode.h;
+        }
+
+        //
+        switch ( layout_mode )
+        {
+            case LAYOUT_MODE.HBOX: layout_mode_hbox.apply( this ); break;
+            default:
+        }
+
+        // Layout Childs
+        foreach( c; childs )
+            c.layout();
+    }
+
+
+    //
+    void center_1_child()
+    {
+        //
+    }
+
+
+    //
+    void center_all_childs()
+    {
+        //
+    }
+}
+
+
+mixin template StateObject( T )
+{
+    BitFlags!STATES state;
+
+
+    void change_state( SDL_Event* e )
+    {
+        if ( e.type == SDL_MOUSEBUTTONDOWN )
+            state |= STATE_PRESSED;
+        else
+        if ( e.type == SDL_MOUSEBUTTONUP )
+            state &= ~STATE_PRESSED;        
+    }
+}
