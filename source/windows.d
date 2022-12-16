@@ -2,7 +2,6 @@ module windows;
 
 import bindbc.sdl;
 import window;
-import tree;
 import gobject;
 
 //
@@ -27,8 +26,8 @@ void unmanage_window( Window window )
 void find_windows_with_object( ref Window[] obj_windows, GObject obj )
 {
     foreach ( window; managed_windows )
-        if ( window.tree !is null )
-            foreach ( ref o; window.tree.all_childs )
+        if ( window.root !is null )
+            foreach ( ref o; window.root.all_childs )
                 if ( o is obj )
                     obj_windows ~= window; // tree found
 }

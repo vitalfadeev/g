@@ -3,7 +3,6 @@ module popupmenu;
 import std.stdio;
 import std.typecons;
 import bindbc.sdl;
-import tree;
 import op;
 import gobject;
 import window;

@@ -157,6 +157,60 @@ class TreeObject : Object
             front = front.r;
         }
     }
+
+
+    //
+    AllChildsForwardIterator all_childs()
+    {
+        return AllChildsForwardIterator( this );
+    }
+
+    struct AllChildsForwardIterator
+    {
+        TreeObject   front;
+        TreeObject[] parents;
+
+        this( TreeObject root )
+        {
+            this.front  = root;
+        }
+
+        bool empty()
+        {
+            return ( front is null );
+        }
+
+        void popFront()
+        {
+            if ( front.l_child !is null )
+            {
+                parents ~= front;
+                front = front.l_child;
+            }
+
+            else
+            if ( front.r !is null )
+                front = front.r;
+
+            else
+            {
+                while ( parents.length > 0 )
+                {                
+                    front = parents[ $-1 ];
+                    parents.length -= 1;
+
+                    if ( front.r !is null )
+                    {
+                        front = front.r;
+                        break;
+                    }
+                }
+
+                if ( parents.length == 0 )
+                    front = null;
+            }
+        }
+    }
 }
 
 
@@ -169,10 +223,12 @@ void each_child( FUNC )( TreeObject root, FUNC callback )
 
 
 //
-void each_child_main( TreeObject root, SDL_Event* e )
+size_t each_child_main( TreeObject root, SDL_Event* e )
 {
+    size_t res;
+
     foreach ( c; root.childs )
-        c.main( e );
+        res = c.main( e );
+
+    return res;
 }
-
-

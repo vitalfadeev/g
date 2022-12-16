@@ -5,7 +5,6 @@ import std.format;
 import std.stdio;
 import std.string;
 import bindbc.sdl;
-import tree;
 import treeobject;
 import gobject;
 import op;

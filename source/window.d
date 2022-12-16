@@ -4,11 +4,12 @@ import std.conv;
 import std.format;
 import std.stdio;
 import std.typecons;
-import tree;
+import root;
 import op;
 import defs;
 import panel;
 import windows;
+import gobject;
 import bindbc.sdl;
 import sdlexception;
 
@@ -17,13 +18,13 @@ import sdlexception;
 class Window
 {
     SDL_Window*   window;
-    Tree          tree;
+    GObject       root;
     SDL_Renderer* renderer;
 
-    this( SDL_Window* window, Tree tree, SDL_Renderer* renderer )
+    this( SDL_Window* window, GObject root, SDL_Renderer* renderer )
     {
         this.window   = window;
-        this.tree     = tree;
+        this.root     = root;
         this.renderer = renderer;
     }
 
@@ -65,10 +66,8 @@ class Window
             ( e.type == SDL_MOUSEBUTTONUP ))
         {
             if ( SDL_GetWindowID( window ) == e.button.windowID )
-            {
-                if ( tree !is null )
-                    return tree.main( e );
-            }
+                if ( root !is null )
+                    return root.main( e );
         }
 
         // SDL_MOUSEWHEEL
@@ -76,10 +75,8 @@ class Window
         if ( e.type == SDL_MOUSEWHEEL )
         {
             if ( SDL_GetWindowID( window ) == e.wheel.windowID )
-            {
-                if ( tree !is null )
-                    return tree.main( e );
-            }
+                if ( root !is null )
+                    return root.main( e );
         }
 
         // ANY

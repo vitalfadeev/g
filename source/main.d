@@ -2,13 +2,14 @@ import std.conv;
 import std.format;
 import std.stdio;
 import std.typecons;
-import tree;
+import root;
 import op;
 import defs;
 import gobject;
 import window;
 import windows;
 import panel;
+import bottom_panel;
 import bindbc.sdl;
 import bindbc.sdl.ttf;
 import sdlexception;
@@ -22,26 +23,51 @@ int main()
     //
     register_custom_events();
 
-    // Tree
-    Tree tree;
-    create_tree( tree );
+    // Tree Root
+    Root root = new Root();
+
+    // 1.
+    // Panel
+    Panel panel;
+    create_tree( root, panel );
 
     // Window
     SDL_Window* window;
     create_window( window );
 
     // Window size
-    window_size_fromn_gobject( window, tree.root );
+    //window_size_fromn_gobject( window, panel );
 
     // Renderer
     SDL_Renderer* renderer;
     create_renderer( window, renderer );
 
     // Save window for manage
-    manage_window( new Window( window, tree, renderer ) );
+    manage_window( new Window( window, panel, renderer ) );
 
+    // 2.
+    // Panel 2
+    BottomPanel panel2;
+    create_tree2( root, panel2 );
+
+    // Window 2
+    SDL_Window* window2;
+    create_window2( window2 );
+
+    // Renderer
+    SDL_Renderer* renderer2;
+    create_renderer( window2, renderer2 );
+
+    // Save window for manage
+    manage_window( new Window( window2, panel2, renderer2 ) );
+
+    //
+    // Styles
+    create_styles( root );
+
+    //
     // Render
-    tree.push_render();
+    root.push_render();
 
     // Event Loop
     event_loop();
@@ -99,10 +125,8 @@ void init_sdl()
 
 
 //
-void create_tree( ref Tree tree )
+void create_tree( ref Root root, ref Panel panel )
 {
-    tree = new Tree;
-
     // +----------------------------------------------+ Panel
     // | +------------+ +------------+ +------------+ | RBox, CBox, LBox
     // | | +--------+ | | +--------+ | | +---++---+ | | LButton, Clock, RButton
@@ -111,9 +135,10 @@ void create_tree( ref Tree tree )
     // | +------------+ +------------+ +------------+ |
     // +----------------------------------------------+
 
+    // 1.
     // Panel
-    auto panel = new Panel;
-    tree.root = panel;
+    panel = new Panel;
+    root.add_child( panel );
     panel.rect.x = 0;
     panel.rect.y = 0;
     panel.w_mode = WMODE.DISPLAY;
@@ -162,11 +187,39 @@ void create_tree( ref Tree tree )
     rb2.w_mode = WMODE.FIXED;
     rb2.rect.w = 64;
     rb2.layout_mode = LAYOUT_MODE.FIXED;
+}
 
+
+void create_tree2( ref Root root, ref BottomPanel panel2 )
+{
+    // 2.
+    // Bottom Panel
+    panel2 = new BottomPanel;
+    root.add_child( panel2 );
+    panel2.rect.x = 0;
+    panel2.rect.y = 200; // 768 - 96 - 100;
+    panel2.w_mode = WMODE.DISPLAY;
+    panel2.h_mode = HMODE.FIXED;
+    panel2.rect.h = 96;
+    panel2.layout_mode  = LAYOUT_MODE.HBOX;
+    panel2.childs_align = CHILDS_ALIGN.CENTER;
+
+    auto ab1 = new AppButton;
+    panel2.add_child( ab1 );
+    ab1.text = "App";
+    ab1.w_mode = WMODE.FIXED;
+    ab1.rect.w = 96;
+    ab1.layout_mode = LAYOUT_MODE.FIXED;
+    ab1.borders_enable = true;
+}
+
+
+void create_styles( ref Root root )
+{
     // CSS
     import style : create_style, apply_styles_recursive;
     create_style();
-    apply_styles_recursive( panel );
+    apply_styles_recursive( root );    
 }
 
 
@@ -211,6 +264,28 @@ void create_window( ref SDL_Window* window )
             0,
             0,
             1366, 29,
+            SDL_WINDOW_BORDERLESS
+        );
+
+    if ( !window )
+        throw new SDLException( "Failed to create window" );
+
+    // Always On Top
+    SDL_SetWindowAlwaysOnTop( window, SDL_TRUE );
+
+    // Update
+    SDL_UpdateWindowSurface( window );
+}
+
+
+void create_window2( ref SDL_Window* window )
+{
+    // Window
+    window = 
+        SDL_CreateWindow(
+            "SDL2 Window",
+            0, 100,
+            1366, 96,
             SDL_WINDOW_BORDERLESS
         );
 
@@ -284,7 +359,7 @@ void obj_windows_main( GObject obj, SDL_Event* e )
     foreach ( window; obj_windows )
     {
         // Layout
-        window.tree.layout();
+        window.root.layout();
 
         // Render
         obj.render( window.renderer );

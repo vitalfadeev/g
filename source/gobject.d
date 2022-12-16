@@ -34,7 +34,7 @@ class GObject : TreeObject
     int   layout_mode_hbox_child_width = 0; // px
     //WMODE layout_mode_hbox_child_w_mode = WMODE.FIXED;
 
-    bool borders_enable;
+    bool borders_enable = false;
 
     CHILDS_ALIGN childs_align;
 
@@ -47,7 +47,7 @@ class GObject : TreeObject
         if ( e.type == SDL_MOUSEWHEEL      ) return _mouse_wheel( e );
         if ( e.type == OP.RENDER           ) return render( e );
         //if ( e.type == OP.DRAWED ) return this.drawed( e );
-        return super.main( e );
+        return this.each_child_main( e );
     }
 
 
