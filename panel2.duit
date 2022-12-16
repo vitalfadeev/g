@@ -8,6 +8,7 @@ bottom_panel.BottomPanel
   childs_align = CHILDS_ALIGN.CENTER
 
   bottom_panel.AppButton
+    bindo  = "bottom_panel.AppButton"
     text   = "App"
     rect.x = 635
     rect.y = 0

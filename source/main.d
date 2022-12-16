@@ -357,7 +357,7 @@ void event_loop()
             // RENDER
             else
             if ( e.type == OP.RENDER )
-                obj_windows_main( cast( GObject )e.user.data1, &e );
+                obj_windows_render( cast( GObject )e.user.data1, &e );
 
             // ANY
             else
@@ -368,27 +368,18 @@ void event_loop()
 
 
 //
-void obj_windows_main( GObject obj, SDL_Event* e )
+void obj_windows_render( GObject obj, SDL_Event* e )
 {
     // Find
     Window[] obj_windows;
     find_windows_with_object( obj_windows, obj );
 
-    // Render
+    // Render (object in each window containing object)
     foreach ( window; obj_windows )
     {
-        // Layout
-        window.root.layout();
-
-        // Render
-        obj.render( window.renderer );
-
-        // Raxterize
-        SDL_RenderPresent( window.renderer );
+        e.user.data2 = cast( void* )window.renderer;
+        obj.main( e );
     }
-
-    foreach ( w; managed_windows )
-        w.main( e );
 }
 
 // SafeHandle!(SDL_Window,SDL_DestroyWindow)

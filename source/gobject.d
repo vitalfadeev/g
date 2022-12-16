@@ -315,6 +315,17 @@ mixin template EventObject( T )
 
     size_t render( SDL_Event* e )
     {
+        SDL_Renderer* renderer = cast( SDL_Renderer* )e.user.data2;
+
+        // Layout
+        layout();
+
+        // Render
+        this.render( renderer );
+
+        // Raxterize
+        SDL_RenderPresent( renderer );
+
         return 0;
     }
 

@@ -153,11 +153,20 @@ class IndRec
 
 GObject add_child( ref IndRec[] indents, size_t indent, GObject e, string name )
 {
-    //auto c = new GObject(); // = cast( GObject ) Object.factory( name );
-    auto c = cast( GObject ) Object.factory( name );
+    GObject c;
+    writeln( object.TypeInfo_Class.find( name ) );
+
+    if ( object.TypeInfo_Class.find( name ) is null )
+        c = new GObject();
+    else
+        c = cast( GObject ) Object.factory( name );
+
     c.duit_class = name;
+
     indents ~= new IndRec( indent, c );
+
     e.add_child( c );
+
     return c;
 }
 
@@ -182,6 +191,11 @@ void assign_property( GObject e, string property, string value )
 {
     // property = value
 
+    if ( property == "bindo" ) { 
+        e.bindo = cast( GObject )Object.factory( value.strip("\"") ); 
+        return; 
+    }
+
     static
     foreach ( p; FieldNameTuple!GObject )
     {
@@ -193,7 +207,11 @@ void assign_property( GObject e, string property, string value )
     if ( property == "rect.y" ) { e.rect.y = value.to!(typeof(e.rect.y)); return; }
     if ( property == "rect.h" ) { e.rect.h = value.to!(typeof(e.rect.h)); return; }
 
-    if ( property == "text" ) { (cast(Button)e).text = value.strip("\""); return; }
+    if ( property == "text" ) { 
+        if ( cast(Button)e )
+            (cast(Button)e).text = value.strip("\""); 
+        return; 
+    }
 
     writeln( "SKIP: property: ", property );
 }
