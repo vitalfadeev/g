@@ -160,7 +160,7 @@ class IndRec
 GObject add_child( ref IndRec[] indents, size_t indent, GObject e, string name )
 {
     GObject c;
-    writeln( object.TypeInfo_Class.find( name ) );
+    //writeln( object.TypeInfo_Class.find( name ) );
 
     if ( object.TypeInfo_Class.find( name ) is null )
         c = new GObject();
@@ -212,6 +212,7 @@ void save_child_properties( GObject o, ref File file, int level )
     ignore["parent"]  = true;
     ignore["l"]       = true;
     ignore["r"]       = true;
+    ignore["duit_class"] = true;
 
     size_t max_field_name_len;
 

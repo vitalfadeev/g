@@ -7,14 +7,23 @@ bottom_panel.BottomPanel
   layout_mode  = HBOX
   childs_align = CENTER
 
-  bottom_panel.AppButton
-    bindo  = "bottom_panel.AppButton"
-    text   = "App"
-    rect.x = 635
+  bottom_panel.WinList
+    rect.x = 0
     rect.y = 0
-    w_mode = FIXED
-    rect.w = 96
+    w_mode = DISPLAY
     h_mode = FIXED
     rect.h = 96
-    layout_mode    = FIXED
-    borders_enable = true
+    layout_mode  = HBOX
+    childs_align = CENTER
+
+    bottom_panel.AppButton
+      bindo  = "bottom_panel.AppButton"
+      text   = "App"
+      rect.x = 635
+      rect.y = 0
+      w_mode = FIXED
+      rect.w = 96
+      h_mode = FIXED
+      rect.h = 96
+      layout_mode    = FIXED
+      borders_enable = true

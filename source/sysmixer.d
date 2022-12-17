@@ -10,7 +10,6 @@ import gobject;
 import op;
 import defs;
 import button;
-import text;
 import tools;
 import style;
 import sdlexception;

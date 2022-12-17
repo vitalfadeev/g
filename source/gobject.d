@@ -1,6 +1,7 @@
 module gobject;
 
 import std.stdio;
+import std.string;
 import std.typecons;
 import bindbc.sdl;
 import op;
@@ -18,6 +19,7 @@ class GObject
     mixin LayoutObject!GObject;
     mixin EventObject!GObject;
     mixin RenderObject!GObject;
+    mixin TextObject!GObject;
 
     ubyte flags;
 
@@ -370,6 +372,7 @@ mixin template RenderObject( T )
         // bg, borders
         render_bg( renderer );
         render_borders( renderer );
+        render_text( renderer );
 
         // Render childs
         render_childs( renderer );
@@ -409,5 +412,89 @@ mixin template RenderObject( T )
         crect.y = rect.y + padding_t;
         crect.w = rect.w - padding_l - padding_r;
         crect.h = rect.h - padding_t - padding_b;
+    }
+}
+
+
+mixin template TextObject( T )
+{
+    string text;
+    string font_file = "InputSansCondensed-Regular.ttf";
+    int    font_size = 17;
+
+
+    void render_text( SDL_Renderer* renderer )
+    {
+        // Font
+        TTF_Font* font = TTF_OpenFont( font_file.toStringz, font_size );
+        if ( !font )
+            throw new SDLException( "TTF_OpenFont()" );
+
+        //TTF_SetFontStyle( font, TTF_STYLE_BOLD );
+
+        // Color
+        SDL_Color white = { 255, 255, 255 };
+        SDL_Color bg_c  = { 0, 0, 0 };
+
+        // Text Rect
+        SDL_Rect trect;
+        {
+            // Content Rect
+            SDL_Rect crect;
+            content_rect( &crect );
+
+            // Text Rect
+            int w;
+            int h;
+            if ( TTF_SizeText( font, text.toStringz, &w, &h ) )
+                throw new SDLException( "TTF_SizeText()" );
+            trect.x = crect.x;
+            trect.y = crect.y;
+            trect.w = w;
+            trect.h = h;
+
+            // Center Text inside Content Rect
+            center_rect_in_rect( &trect, &crect );
+
+            // Clip
+            SDL_RenderSetClipRect( renderer, &crect );
+        }
+
+        // Render
+        SDL_Surface* text_surface =
+            TTF_RenderText_Solid( font, text.toStringz, white ); 
+            //TTF_RenderText_Shaded( font, "Text", white, bg_c ); 
+
+        SDL_Texture* text_texture = 
+            SDL_CreateTextureFromSurface( renderer, text_surface );
+
+        // Copy
+        SDL_RenderCopy( renderer, text_texture, null, &trect );
+
+        // Free
+        SDL_RenderSetClipRect( renderer, null );
+        TTF_CloseFont( font );
+        SDL_FreeSurface( text_surface );
+        SDL_DestroyTexture( text_texture );
+    }
+
+
+    int text_width()
+    {
+        // Text
+        TTF_Font* font = TTF_OpenFont( font_file.toStringz, font_size );
+        if ( !font )
+            throw new SDLException( "TTF_OpenFont()" );
+
+        //TTF_SetFontStyle( font, TTF_STYLE_BOLD );
+
+        int w;
+        int h;
+        if ( TTF_SizeText( font, text.toStringz, &w, &h ) )
+            throw new SDLException( "TTF_SizeText()" );
+
+        TTF_CloseFont( font );
+
+        return w;
     }
 }

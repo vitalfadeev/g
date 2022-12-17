@@ -10,7 +10,6 @@ import gobject;
 import op;
 import defs;
 import button;
-import text;
 import tools;
 import style;
 import sysmixer;
@@ -29,7 +28,7 @@ class Panel : GObject
 }
 
 
-class Clock : Text
+class Clock : GObject
 {
     SDL_TimerID timer;
     Uint32      timer_interval = 1000; // ms

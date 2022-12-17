@@ -2,6 +2,8 @@ import std.conv;
 import std.format;
 import std.stdio;
 import std.typecons;
+import bindbc.sdl;
+import bindbc.sdl.ttf;
 import root;
 import op;
 import defs;
@@ -10,19 +12,19 @@ import window;
 import windows;
 import panel;
 import bottom_panel;
-import bindbc.sdl;
-import bindbc.sdl.ttf;
+import sys_task;
 import sdlexception;
 
 
-void main()
+void main2()
 {
     import duit;
     test1();
     test2();
+    test_sys_task();
 }
 
-int main1()
+int main()
 {
     // Init
     init_sdl();
