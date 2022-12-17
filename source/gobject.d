@@ -20,6 +20,7 @@ class GObject
     mixin EventObject!GObject;
     mixin RenderObject!GObject;
     mixin TextObject!GObject;
+    mixin ImageObject!GObject;
 
     ubyte flags;
 
@@ -373,6 +374,7 @@ mixin template RenderObject( T )
         render_bg( renderer );
         render_borders( renderer );
         render_text( renderer );
+        render_image( renderer );
 
         // Render childs
         render_childs( renderer );
@@ -381,9 +383,12 @@ mixin template RenderObject( T )
 
     void render_bg( SDL_Renderer* renderer )
     {
-        // fill rect x, y, w, h
-        SDL_SetRenderDrawColor( renderer, bg.r, bg.g, bg.b, bg.a  );
-        SDL_RenderFillRect( renderer, &rect );
+        if ( bg.a != 0 )
+        {        
+            // fill rect x, y, w, h
+            SDL_SetRenderDrawColor( renderer, bg.r, bg.g, bg.b, bg.a );
+            SDL_RenderFillRect( renderer, &rect );
+        }
     }
 
 
@@ -425,57 +430,60 @@ mixin template TextObject( T )
 
     void render_text( SDL_Renderer* renderer )
     {
-        // Font
-        TTF_Font* font = TTF_OpenFont( font_file.toStringz, font_size );
-        if ( !font )
-            throw new SDLException( "TTF_OpenFont()" );
-
-        //TTF_SetFontStyle( font, TTF_STYLE_BOLD );
-
-        // Color
-        SDL_Color white = { 255, 255, 255 };
-        SDL_Color bg_c  = { 0, 0, 0 };
-
-        // Text Rect
-        SDL_Rect trect;
+        if ( text.length > 0 )
         {
-            // Content Rect
-            SDL_Rect crect;
-            content_rect( &crect );
+            // Font
+            TTF_Font* font = TTF_OpenFont( font_file.toStringz, font_size );
+            if ( !font )
+                throw new SDLException( "TTF_OpenFont()" );
+
+            //TTF_SetFontStyle( font, TTF_STYLE_BOLD );
+
+            // Color
+            SDL_Color white = { 255, 255, 255 };
+            SDL_Color bg_c  = { 0, 0, 0 };
 
             // Text Rect
-            int w;
-            int h;
-            if ( TTF_SizeText( font, text.toStringz, &w, &h ) )
-                throw new SDLException( "TTF_SizeText()" );
-            trect.x = crect.x;
-            trect.y = crect.y;
-            trect.w = w;
-            trect.h = h;
+            SDL_Rect trect;
+            {
+                // Content Rect
+                SDL_Rect crect;
+                content_rect( &crect );
 
-            // Center Text inside Content Rect
-            center_rect_in_rect( &trect, &crect );
+                // Text Rect
+                int w;
+                int h;
+                if ( TTF_SizeText( font, text.toStringz, &w, &h ) )
+                    throw new SDLException( "TTF_SizeText()" );
+                trect.x = crect.x;
+                trect.y = crect.y;
+                trect.w = w;
+                trect.h = h;
 
-            // Clip
-            SDL_RenderSetClipRect( renderer, &crect );
+                // Center Text inside Content Rect
+                center_rect_in_rect( &trect, &crect );
+
+                // Clip
+                SDL_RenderSetClipRect( renderer, &crect );
+            }
+
+            // Render
+            SDL_Surface* text_surface =
+                TTF_RenderText_Solid( font, text.toStringz, white ); 
+                //TTF_RenderText_Shaded( font, "Text", white, bg_c ); 
+
+            SDL_Texture* text_texture = 
+                SDL_CreateTextureFromSurface( renderer, text_surface );
+
+            // Copy
+            SDL_RenderCopy( renderer, text_texture, null, &trect );
+
+            // Free
+            SDL_RenderSetClipRect( renderer, null );
+            TTF_CloseFont( font );
+            SDL_FreeSurface( text_surface );
+            SDL_DestroyTexture( text_texture );
         }
-
-        // Render
-        SDL_Surface* text_surface =
-            TTF_RenderText_Solid( font, text.toStringz, white ); 
-            //TTF_RenderText_Shaded( font, "Text", white, bg_c ); 
-
-        SDL_Texture* text_texture = 
-            SDL_CreateTextureFromSurface( renderer, text_surface );
-
-        // Copy
-        SDL_RenderCopy( renderer, text_texture, null, &trect );
-
-        // Free
-        SDL_RenderSetClipRect( renderer, null );
-        TTF_CloseFont( font );
-        SDL_FreeSurface( text_surface );
-        SDL_DestroyTexture( text_texture );
     }
 
 
@@ -496,5 +504,51 @@ mixin template TextObject( T )
         TTF_CloseFont( font );
 
         return w;
+    }
+}
+
+
+mixin template ImageObject( T )
+{
+    string image;
+
+
+    void render_image( SDL_Renderer* renderer )
+    {
+        if ( image.length > 0 )
+        {
+            string real_file = image;
+
+            // SDL_IMG
+            SDL_Surface* img_surface = IMG_Load( real_file.toStringz );
+
+            if ( img_surface is null ) 
+            {
+                import std.format;
+                throw new SDLException( 
+                    format!
+                        "could not load image: %s"
+                        ( IMG_GetError() )
+                );
+            }
+
+            // 
+            SDL_Rect imgrect;
+            imgrect.x = rect.x + 55;
+            imgrect.y = rect.y;
+            imgrect.w = 28;
+            imgrect.h = 28;
+
+            //
+            SDL_Texture* img_texture = 
+                SDL_CreateTextureFromSurface( renderer, img_surface );
+
+            // Copy
+            SDL_RenderCopy( renderer, img_texture, null, &imgrect );
+
+            //
+            SDL_FreeSurface( img_surface );
+            SDL_DestroyTexture( img_texture );
+        }
     }
 }

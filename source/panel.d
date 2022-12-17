@@ -207,8 +207,7 @@ class RMenuButton : Button
 
 class SoundIndicator : RMenuButton
 {
-    string icon;
-    float  level;
+    float level;
 
     // icon
     // mouse scroll up   - volume up
@@ -282,17 +281,17 @@ class SoundIndicator : RMenuButton
     void update_icon()
     {
         if ( level == 0 )
-            icon = "disabled";
+            image = "audio-status\\disabled.png";
         else if ( level == 0 )
-            icon = "mute";
+            image = "audio-status\\mute.png";
         else if ( level < .25 )
-            icon = "audio-25";
+            image = "audio-status\\audio-25.png";
         else if ( level < .50 )
-            icon = "audio-50";
+            image = "audio-status\\audio-50.png";
         else if ( level < .75 )
-            icon = "audio-75";
+            image = "audio-status\\audio-75.png";
         else if ( level == 1.0 )
-            icon = "audio-100";        
+            image = "audio-status\\audio-100.png";        
     }
 
 
@@ -312,46 +311,6 @@ class SoundIndicator : RMenuButton
 
     void _render( SDL_Renderer* renderer )
     {
-         render_icon( renderer, icon );
-    }
-
-
-    void render_icon( SDL_Renderer* renderer, string icon_file_name )
-    {
-        if ( icon_file_name.length == 0 )
-            return;
-
-        string real_file = "audio-status\\" ~ icon_file_name ~ ".png";
-
-        // SDL_IMG
-        SDL_Surface* img_surface = IMG_Load( real_file.toStringz );
-
-        if ( img_surface is null ) 
-        {
-            import std.format;
-            throw new SDLException( 
-                format!
-                    "could not load image: %s"
-                    ( IMG_GetError() )
-            );
-        }
-
-        // 
-        SDL_Rect imgrect;
-        imgrect.x = rect.x + 55;
-        imgrect.y = rect.y;
-        imgrect.w = 28;
-        imgrect.h = 28;
-
-        //
-        SDL_Texture* img_texture = 
-            SDL_CreateTextureFromSurface( renderer, img_surface );
-
-        // Copy
-        SDL_RenderCopy( renderer, img_texture, null, &imgrect );
-
-        //
-        SDL_FreeSurface( img_surface );
-        SDL_DestroyTexture( img_texture );
+         render_image( renderer );
     }
 }
