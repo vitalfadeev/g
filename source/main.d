@@ -15,13 +15,14 @@ import bindbc.sdl.ttf;
 import sdlexception;
 
 
-void main2()
+void main()
 {
     import duit;
+    test1();
     test2();
 }
 
-int main()
+int main1()
 {
     // Init
     init_sdl();

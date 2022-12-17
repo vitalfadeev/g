@@ -26,6 +26,9 @@ void test1()
 {
     auto root = read_file( "panel1.duit" );
     dump_tree2( root );
+
+    auto file = File( "panel1-saved.duit", "w" );
+    root.save_childs_recursive( file );
 }
 
 
@@ -33,6 +36,9 @@ void test2()
 {
     auto root = read_file( "panel2.duit" );
     dump_tree2( root );
+
+    auto file = File( "panel2-saved.duit", "w" );
+    root.save_childs_recursive( file );
 }
 
 
@@ -170,6 +176,69 @@ GObject add_child( ref IndRec[] indents, size_t indent, GObject e, string name )
     return c;
 }
 
+
+void load_childs( GObject o )
+{
+    //
+}
+
+
+void save_childs_recursive( GObject o, ref File file, int level=0 )
+{
+    foreach ( c; o.childs )
+    {
+        save_child_class( o, file, level );
+        save_child_properties( o, file, level );
+        file.writeln();
+        save_childs_recursive( c, file, level+1 );
+    }
+}
+
+
+void save_child_class( GObject o, ref File file, int level )
+{
+    file.writeln( 
+        replicate( "  ", level ), 
+        o
+    );
+}
+
+
+void save_child_properties( GObject o, ref File file, int level )
+{
+    bool[string] ignore;
+    ignore["l_child"] = true;
+    ignore["r_child"] = true;
+    ignore["parent"]  = true;
+    ignore["l"]       = true;
+    ignore["r"]       = true;
+
+    size_t max_field_name_len;
+
+    static
+    foreach ( field_name; FieldNameTuple!GObject )
+        if ( field_name.length > max_field_name_len )
+            max_field_name_len = field_name.length;
+
+    static
+    foreach ( field_name; FieldNameTuple!GObject )
+    {
+        if ( field_name in ignore ) {}
+        else
+            if ( __traits( getMember, o, field_name ) !is __traits( getMember, o, field_name ).init )
+            {
+                file.writeln( 
+                    "  ",
+                    replicate( "  ", level ), 
+                    field_name.leftJustify( max_field_name_len ), 
+                    " = ", 
+                    __traits( getMember, o, field_name ) 
+                );
+            }
+    }
+}
+
+
 GObject find_parent( ref IndRec[] indents, size_t indent, GObject e )
 {
     IndRec cur;
@@ -284,11 +353,19 @@ auto string_to_value( T )( string value )
     static
     foreach ( emb; EnumMembers!T )
     {
-        if ( T.stringof ~ "." ~ emb.stringof == value ) return emb;
+        if ( T.stringof ~ "." ~ emb.stringof == value ) return emb; // WMODE.FIXED
+        if ( emb.stringof == value ) return emb;                    // FIXED
     }
 
     return T.init; // default
 }
+
+// SDL_Rect(0, 0, 0, 29)
+//auto string_to_value( T )( string value )
+//    if ( is( T == struct ) )
+//{
+//    //
+//}
 
 struct ParseState
 {

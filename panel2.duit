@@ -1,20 +1,20 @@
 bottom_panel.BottomPanel
   rect.x = 0
   rect.y = 0
-  w_mode = WMODE.DISPLAY
-  h_mode = HMODE.FIXED
+  w_mode = DISPLAY
+  h_mode = FIXED
   rect.h = 96
-  layout_mode  = LAYOUT_MODE.HBOX
-  childs_align = CHILDS_ALIGN.CENTER
+  layout_mode  = HBOX
+  childs_align = CENTER
 
   bottom_panel.AppButton
     bindo  = "bottom_panel.AppButton"
     text   = "App"
     rect.x = 635
     rect.y = 0
-    w_mode = WMODE.FIXED
+    w_mode = FIXED
     rect.w = 96
-    h_mode = HMODE.FIXED
+    h_mode = FIXED
     rect.h = 96
-    layout_mode    = LAYOUT_MODE.FIXED
+    layout_mode    = FIXED
     borders_enable = true
