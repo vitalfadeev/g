@@ -187,8 +187,8 @@ void save_childs_recursive( GObject o, ref File file, int level=0 )
 {
     foreach ( c; o.childs )
     {
-        save_child_class( o, file, level );
-        save_child_properties( o, file, level );
+        save_child_class( c, file, level );
+        save_child_properties( c, file, level );
         file.writeln();
         save_childs_recursive( c, file, level+1 );
     }
