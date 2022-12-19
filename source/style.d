@@ -100,7 +100,6 @@ class Style5 : Style
     override
     void apply( GObject o )
     {
-        import panel;
         o.padding_t = 0;
     }
 }
@@ -115,7 +114,6 @@ class Style6 : Style
     override
     void apply( GObject o )
     {
-        import panel;
         o.padding_t = 0;
     }
 }
@@ -130,7 +128,6 @@ class Style7 : Style
     override
     void apply( GObject o )
     {
-        import panel;
         o.padding_t = 0;
     }
 }
@@ -149,7 +146,6 @@ class Style8 : Style
     }
 }
 
-
 class Style9 : Style
 {
     this()
@@ -161,9 +157,10 @@ class Style9 : Style
     override
     void apply( GObject o )
     {
-        o.bg = SDL_Color(  48,  48, 48, SDL_ALPHA_OPAQUE );
+        o.bg = SDL_Color( 48, 48, 48, SDL_ALPHA_OPAQUE );
     }
 }
+
 
 //
 void apply_styles_recursive( GObject cur )

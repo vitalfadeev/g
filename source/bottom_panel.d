@@ -19,14 +19,7 @@ import sdlexception;
 
 class BottomPanel : GObject
 {
-    override
-    size_t main( SDL_Event* e )
-    {
-        //writeln( this, ": ", e.type );
-        //if ( e.type == OP.RENDER   ) return this.render( e );
-        //if ( e.type == op.rendered ) return this.rendered( e );
-        return super.main( e );
-    }
+    //
 }
 
 class AppButton : Button
@@ -74,9 +67,13 @@ class WinList : GObject
     //
     void update()
     {
+        // Clear
         clear_childs();
+
+        // Add Childs
         SysTask.each_task( &_sys_task_each_callback );
     }
+
 
     void _sys_task_each_callback( HWND hwnd, string s )
     {
@@ -93,9 +90,10 @@ class WinList : GObject
         ab.rect.h         = 96;
         ab.layout_mode    = LAYOUT_MODE.FIXED;
         ab.borders_enable = true;
-        ab.fg             = SDL_Color( 220, 220, 220, SDL_ALPHA_OPAQUE );
-        ab.bg             = SDL_Color( 120, 120, 120, SDL_ALPHA_OPAQUE );
+        //ab.fg             = SDL_Color( 220, 220, 220, SDL_ALPHA_OPAQUE );
+        //ab.bg             = SDL_Color( 120, 120, 120, SDL_ALPHA_OPAQUE );
     }
+
 
     void clear_childs()
     {

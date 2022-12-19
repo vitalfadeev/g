@@ -18,13 +18,7 @@ import sdlexception;
 
 class Panel : GObject
 {
-    override
-    size_t main( SDL_Event* e )
-    {
-        //if ( e.type == OP.RENDER   ) return this.render( e );
-        //if ( e.type == op.rendered ) return this.rendered( e );
-        return super.main( e );
-    }
+    //
 }
 
 
@@ -252,7 +246,7 @@ class SoundIndicator : RMenuButton
 
         update_level();
         update_text();
-        //update_icon();
+        //update_image();
     }
 
 
@@ -262,7 +256,7 @@ class SoundIndicator : RMenuButton
 
         update_level();
         update_text();
-        //update_icon();
+        //update_image();
     }
 
 
@@ -274,11 +268,11 @@ class SoundIndicator : RMenuButton
 
     void update_text()
     {
-        text = ( level * 100 ).to!string;        
+        text = ( level * 100 ).to!string;
     }
 
 
-    void update_icon()
+    void update_image()
     {
         if ( level == 0 )
             image = "audio-status\\disabled.png";
@@ -298,19 +292,5 @@ class SoundIndicator : RMenuButton
     float _get_current_volume()
     {
         return sys_mixer.get_current_volume();
-    }
-
-
-    override
-    void render( SDL_Renderer* renderer )
-    {
-        super.render( renderer );
-        _render( renderer );
-    }
-
-
-    void _render( SDL_Renderer* renderer )
-    {
-         render_image( renderer );
     }
 }

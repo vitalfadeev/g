@@ -72,6 +72,7 @@ GObject read_file( string file_name )
     //   96 is 96
     //   SDL_Color(   0,   0,  0, SDL_ALPHA_OPAQUE ) is SDL_Color(   0,   0,  0, SDL_ALPHA_OPAQUE )
 
+    // keywords: ( ) , 
 
     auto file = File( file_name );
 
@@ -277,12 +278,6 @@ void assign_property( GObject e, string property, string value )
     if ( property == "rect.y" ) { e.rect.y = value.to!(typeof(e.rect.y)); return; }
     if ( property == "rect.h" ) { e.rect.h = value.to!(typeof(e.rect.h)); return; }
 
-    if ( property == "text" ) { 
-        if ( cast(Button)e )
-            (cast(Button)e).text = value.strip("\""); 
-        return; 
-    }
-
     writeln( "SKIP: property: ", property );
 }
 
@@ -312,9 +307,133 @@ auto string_to_value( T )( string value )
     return ubyte.init;
 }
 
+auto string_to_value_struct( T )( string value )
+    if ( is( T == struct ) )
+{
+    // SDL_Color(0, 0, 0, 0) --> 
+    //   "SDL_Color", "(", "0", "," , "0", ",", "0", ",", "0", ")"
+
+    // SDL_Color(0, 0, 0, 0)
+    //
+    // fields = Fields T
+    // cur = take_struct_value_token( string, start_pos )
+    // foreach ( f; fields )
+    //    f.value = cur.value
+    //    cur = take_struct_value_token( string, cur.next_pos )
+    auto tokenizer = Tokenizer( value );
+    Tokenizer.Token token;
+    
+    string[] tks;
+
+    while ( tokenizer.get_token( token ) )
+    {
+        tks ~= token.s;
+    }
+
+    writeln( "TKS: ", tks );
+
+    return T.init;
+}
+
+struct Tokenizer
+{
+    string s;
+    size_t pos;
+    string[] keywords = [ "(", ")", "," ];
+
+    struct Token
+    {
+        string s; // s.length == 0 - is EOF
+        size_t pos;
+    }
+
+    this( string s )
+    {
+        this.s = s;
+    }
+
+    bool get_token( ref Token token )
+    {
+        size_t len;
+
+        // not eof
+        if ( s.length != 0 )
+        if ( pos < s.length )
+        {
+            // space
+            if ( s[ pos ].isWhite )
+            {
+                // skip spaces
+                _read_space( len );
+
+                //
+                pos += len;
+
+                //
+                if ( pos >= s.length )
+                    return false; // EOF
+            }
+
+            // read token
+            _read_non_space( len );
+
+            // token
+            token.s   = s[ pos..pos+len ];
+            token.pos = pos;
+
+            pos += len;
+
+            return true; // Token
+        }
+
+        // EOF
+        return false;
+    }
+
+    void _read_non_space( ref size_t len )
+    {
+        foreach ( keyword; keywords )
+        {
+            if ( s[pos..$].startsWith( keyword ) )
+            {
+                len = keyword.length;
+                return;
+            }
+        }
+
+        size_t i;
+        foreach ( c; s[pos..$] )
+        {
+            foreach ( keyword; keywords )
+            {
+                if ( 
+                    s[pos+i..$].startsWith( keyword ) ||
+                    c.isWhite
+                   )
+                {
+                    len = i;
+                    return;
+                }
+            }
+
+            i++;
+        }
+
+        auto l = s[pos..$].countUntil!( isWhite );
+        len = ( l == -1 ) ? ( s.length - pos ) : l;
+    }
+
+    void _read_space( ref size_t len )
+    {
+        auto l = s[pos..$].countUntil!(not!isWhite);
+        len = ( l == -1 ) ? ( s.length - pos ) : l;
+    }
+}
+
 auto string_to_value( T )( string value )
     if ( is( T == SDL_Color ) )
 {
+    string_to_value_struct!T( value );
     return SDL_Color.init;
 }
 

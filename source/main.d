@@ -16,15 +16,17 @@ import sys_task;
 import sdlexception;
 
 
-void main2()
+void main()
 {
     import duit;
-    test1();
-    test2();
-    test_sys_task();
+    //test1();
+    //test2();
+    //test_sys_task();
+    import dcss;
+    test_css();
 }
 
-int main()
+int main1()
 {
     // Init
     init_sdl();
@@ -389,3 +391,10 @@ void obj_windows_render( GObject obj, SDL_Event* e )
 // SafeHandle!(SDL_Surface,SDL_FreeSurface)
 // SafeHandle!(SDL_Texture,SDL_DestroyTexture)
 // SafeHandle!(SDL_Renderer,SDL_DestroyRenderer)
+
+
+// Source -> ( text, image )[] -> GObject[]
+// parent
+//   childs
+
+

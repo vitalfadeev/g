@@ -231,7 +231,9 @@ mixin template EventObject( T )
         if ( e.type == SDL_MOUSEBUTTONUP   ) return _mouse_button( e );
         if ( e.type == SDL_MOUSEWHEEL      ) return _mouse_wheel( e );
         if ( e.type == OP.RENDER           ) return render( e );
-        //if ( e.type == OP.DRAWED ) return this.drawed( e );
+        //if ( e.type == OP.RENDERED         ) return rendered( e );
+        //if ( e.type == OP.GET_TEXT         ) return get_text( e );
+        //if ( e.type == OP.GET_IMAGE        ) return get_image( e );
         return this.each_child_main( e );
     }
 
@@ -262,19 +264,14 @@ mixin template EventObject( T )
         push_render();
 
         // Childs
-        this.each_child_main( e );
-
-        return 0;
+        return this.each_child_main( e );
     }
 
 
     size_t _mouse_button( SDL_Event* e )
     {
-        //writeln( this, ": ", e.type );
-        //writeln( this, ":   ", e.button.x, ", ", e.button.y );
-        //writeln( this, ":   ", rect.x, ", ", rect.y, " ", rect.w, "x", rect.h );
         if ( hit_test( e.button.x, e.button.y ) ) 
-            mouse_button( e );
+            return mouse_button( e );
 
         return 0;
     }
@@ -291,28 +288,30 @@ mixin template EventObject( T )
         // Remder
         push_render();
 
-        // Childs
-        this.each_child_main( e );
-
         // Context Menu
         if ( e.button.type == SDL_MOUSEBUTTONDOWN )
         if ( e.button.button == SDL_BUTTON_RIGHT )
-        {
-            SDL_Window* cur_window;
-            cur_window = SDL_GetWindowFromID( e.button.windowID );
+            context_menu( e );
 
-            int wx;
-            int wy;
-            SDL_GetWindowPosition( cur_window, &wx, &wy );
+        // Childs
+        return this.each_child_main( e );
+    }
 
-            SDL_Point at_point;
-            at_point.x = e.button.x + wx;
-            at_point.y = e.button.y + wy;
 
-            return show_context_menu( e, cur_window, &at_point );
-        }
+    size_t context_menu( SDL_Event* e )
+    {
+        SDL_Window* cur_window;
+        cur_window = SDL_GetWindowFromID( e.button.windowID );
 
-        return 0;
+        int wx;
+        int wy;
+        SDL_GetWindowPosition( cur_window, &wx, &wy );
+
+        SDL_Point at_point;
+        at_point.x = e.button.x + wx;
+        at_point.y = e.button.y + wy;
+
+        return show_context_menu( e, cur_window, &at_point );
     }
 
 
@@ -329,7 +328,8 @@ mixin template EventObject( T )
         // Raxterize
         SDL_RenderPresent( renderer );
 
-        return 0;
+        // Childs
+        return this.each_child_main( e );
     }
 
 
@@ -375,9 +375,6 @@ mixin template RenderObject( T )
         render_borders( renderer );
         render_text( renderer );
         render_image( renderer );
-
-        // Render childs
-        render_childs( renderer );
     }
 
 
@@ -403,11 +400,11 @@ mixin template RenderObject( T )
     }
 
 
-    void render_childs( SDL_Renderer* renderer )
-    {
-        foreach ( c; childs )
-            c.render( renderer );
-    }
+    //void render_childs( SDL_Renderer* renderer )
+    //{
+    //    foreach ( c; childs )
+    //        c.render( renderer );
+    //}
 
 
     //

@@ -24,18 +24,12 @@ class Button : GObject
         return super.main( e );
     }
 
-    size_t key( SDL_Event* e )
-    {
-        return 0;
-    }
-
-
     override
     size_t mouse_button( SDL_Event* e )
     {
         super.mouse_button( e );
 
-        if ( e.type == SDL_MOUSEBUTTONDOWN )
+        if ( e.type == SDL_MOUSEBUTTONUP )
         if ( e.button.button == SDL_BUTTON_LEFT )
             return click( e );
 
@@ -47,17 +41,4 @@ class Button : GObject
     {
         return 0;
     }
-
-
-    //override
-    //void render( SDL_Renderer* renderer )
-    //{
-    //    // bg, borders
-    //    render_bg( renderer );
-    //    render_borders( renderer );
-    //    render_text( renderer );
-
-    //    // Render childs
-    //    render_childs( renderer );
-    //}
 }
