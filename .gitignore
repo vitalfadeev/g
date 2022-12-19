@@ -16,3 +16,6 @@ g-test-*
 *.lst
 dub.selections.json
 mixins.d
+Desktop.ini
+panel1-saved.duit
+panel2-saved.duit
